@@ -3,8 +3,6 @@ import { useRef, useEffect, forwardRef } from "react";
 import PeelLib, { PeelCorners } from "./peel";
 import { HtmlDivProps, Props, TCoords } from "./types";
 
-const PeelJs = PeelLib();
-
 export const PeelWrapper = forwardRef(Peel);
 
 function Peel(
@@ -19,6 +17,7 @@ function Peel(
   useEffect(() => {
     function initialize() {
       if (!ref.current) return;
+      const PeelJs = PeelLib();
       const p = new PeelJs(ref.current, options);
       peelRef.current = p;
 

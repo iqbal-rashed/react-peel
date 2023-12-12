@@ -1,12 +1,10 @@
 import react from "@vitejs/plugin-react-swc";
-
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
 import EsLint from "vite-plugin-linter";
 import tsConfigPaths from "vite-tsconfig-paths";
 const { EsLinter, linterPlugin } = EsLint;
-import * as packageJson from "./package.json";
 
 // https://vitejs.dev/config/
 export default defineConfig((configEnv) => ({
@@ -29,7 +27,7 @@ export default defineConfig((configEnv) => ({
       fileName: (format) => `react-peel.${format}.js`,
     },
     rollupOptions: {
-      external: [...Object.keys(packageJson.peerDependencies)],
+      external: ["react", "react-dom"],
     },
   },
 }));

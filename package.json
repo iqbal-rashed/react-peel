@@ -1,17 +1,47 @@
 {
   "name": "react-peel",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:docs": "island dev docs",
+    "build:docs": "island build docs",
+    "preview:docs": "island start docs"
   },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/react-peel.es.js",
+      "require": "./dist/react-peel.umd.js"
+    }
+  },
+  "main": "./dist/react-peel.umd.js",
+  "module": "./dist/react-peel.es.js",
+  "types": "./dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iqbal-rashed/react-peel"
+  },
+  "keywords": [
+    "react-peel",
+    "peel.js",
+    "peel animation",
+    "react"
+  ],
+  "bugs": {
+    "url": "https://github.com/iqbal-rashed/react-peel/issues"
+  },
+  "homepage": "https://github.com/iqbal-rashed/react-peel",
   "peerDependencies": {
-    "react": "16.8.0 || >=17.x",
-    "react-dom": "16.8.0 || >=17.x"
+    "react": "16.8.0 || >=17.x || >=18.x",
+    "react-dom": "16.8.0 || >=17.x || >=18.x"
   },
   "devDependencies": {
     "@types/node": "^20.8.8",

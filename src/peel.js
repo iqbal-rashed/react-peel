@@ -1,4 +1,11 @@
-function PeelLib() {
+export const PeelCorners = {
+  TOP_LEFT: 0x0,
+  TOP_RIGHT: 0x1,
+  BOTTOM_LEFT: 0x2,
+  BOTTOM_RIGHT: 0x3,
+};
+
+export default function () {
   // Constants
 
   var PRECISION = 1e2; // 2 decimals
@@ -139,8 +146,8 @@ function PeelLib() {
   function getEventCoordinates(evt, el) {
     var pos = evt.changedTouches ? evt.changedTouches[0] : evt;
     return {
-      x: pos.clientX - el.offsetLeft + window.scrollX,
-      y: pos.clientY - el.offsetTop + window.scrollY,
+      x: pos.clientX - el.getBoundingClientRect().left,
+      y: pos.clientY - el.getBoundingClientRect().top,
     };
   }
 
@@ -206,7 +213,7 @@ function PeelLib() {
     var el = document.createElementNS(SVG_NAMESPACE, tag);
     parent.appendChild(el);
     for (var key in attributes) {
-      if (!attributes.hasOwnProperty(key)) continue;
+      if (!Object.prototype.hasOwnProperty.call(attributes, key)) continue;
       setSVGAttribute(el, key, attributes[key]);
     }
     return el;
@@ -228,6 +235,7 @@ function PeelLib() {
     this.el = getElement(el, docEl);
     this.constraints = [];
     this.events = [];
+    this.dragHandlers = [];
     this.setupLayers();
     this.setupDimensions();
     this.setCorner(this.getOption("corner"));
@@ -240,12 +248,7 @@ function PeelLib() {
    * @constant
    * @public
    */
-  Peel.Corners = {
-    TOP_LEFT: 0x0,
-    TOP_RIGHT: 0x1,
-    BOTTOM_LEFT: 0x2,
-    BOTTOM_RIGHT: 0x3,
-  };
+  Peel.Corners = PeelCorners;
 
   /**
    * Defaults
@@ -362,7 +365,7 @@ function PeelLib() {
    * @public
    */
   Peel.prototype.handleDrag = function (fn, el) {
-    this.dragHandler = fn;
+    this.dragHandlers.push(fn);
     this.setupDragEvents(el);
   };
 
@@ -414,9 +417,9 @@ function PeelLib() {
     }
 
     function dragMove(evt) {
-      if (self.dragHandler) {
-        callHandler(self.dragHandler, evt);
-      }
+      self.dragHandlers.forEach((fn) => {
+        callHandler(fn, evt);
+      });
       isDragging = true;
     }
 
@@ -673,7 +676,10 @@ function PeelLib() {
     var options = opt || {},
       defaults = Peel.Defaults;
     for (var key in defaults) {
-      if (!defaults.hasOwnProperty(key) || key in options) {
+      if (
+        !Object.prototype.hasOwnProperty.call(defaults, key) ||
+        key in options
+      ) {
         continue;
       }
       options[key] = defaults[key];
@@ -685,7 +691,7 @@ function PeelLib() {
    * Finds or creates a layer in the dom.
    * @param {string} id The internal id of the element to be found or created.
    * @param {HTMLElement} parent The parent if the element needs to be created.
-   * @param {numer} zIndex The z index of the layer.
+   * @param {number} zIndex The z index of the layer.
    * @returns {HTMLElement}
    * @private
    */
@@ -1300,14 +1306,28 @@ function PeelLib() {
   };
 
   /**
-   * Gets the next svg clipping id.
+   * Generate unique id.
+   * @public
+   */
+  function generateUniqueId() {
+    if (crypto && crypto.getRandomValues) {
+      var a = new Uint32Array(4);
+      crypto.getRandomValues(a);
+      return a.join("").replace(/[^a-zA-Z0-9]/g, "");
+    } else {
+      return (
+        Math.random().toString(36).substring(2, 15) +
+        Math.random().toString(36).substring(2, 15)
+      );
+    }
+  }
+
+  /**
+   * Gets a svg clipping id.
    * @public
    */
   SVGClip.getId = function () {
-    if (!SVGClip.id) {
-      SVGClip.id = 1;
-    }
-    return "svg-clip-" + SVGClip.id++;
+    return "svg-clip-" + generateUniqueId();
   };
 
   /**
@@ -1685,5 +1705,3 @@ function PeelLib() {
   setCssProperties();
   return Peel;
 }
-
-export default PeelLib();

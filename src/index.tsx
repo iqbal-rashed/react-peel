@@ -212,12 +212,14 @@ export const PeelBack = forwardRef(function (
   { className, ...props }: HtmlDivProps,
   ref: React.LegacyRef<HTMLDivElement>
 ) {
-  return <div ref={ref} className={"peel-top " + className} {...props}></div>;
+  return <div ref={ref} className={"peel-back " + className} {...props}></div>;
 });
 
 export const PeelBottom = forwardRef(function (
   { className, ...props }: HtmlDivProps,
   ref: React.LegacyRef<HTMLDivElement>
 ) {
-  return <div ref={ref} className={"peel-top " + className} {...props}></div>;
+  return (
+    <div ref={ref} className={"peel-bottom " + className} {...props}></div>
+  );
 });

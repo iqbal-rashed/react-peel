@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./main.css";
 import { useRef, useEffect } from "react";
 import { PeelBack, PeelBottom, PeelTop, PeelWrapper } from ".";
 

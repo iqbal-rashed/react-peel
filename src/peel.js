@@ -5,6 +5,8 @@ export const PeelCorners = {
   BOTTOM_RIGHT: 0x3,
 };
 
+// peel.js
+/** @type {() => any} */
 export default function () {
   // Constants
 
@@ -230,6 +232,9 @@ export default function () {
    * @constructor
    * @public
    */
+
+  // peel.js
+  /** @type {Class} */
   function Peel(el, opt) {
     this.setOptions(opt);
     this.el = getElement(el, docEl);
@@ -1703,5 +1708,9 @@ export default function () {
   };
 
   setCssProperties();
+
+  /**
+   * @type Class
+   */
   return Peel;
 }

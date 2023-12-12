@@ -66,7 +66,11 @@ function Peel(
       }
 
       if (props.drag) {
-        peelRef.current?.handleDrag(function (evt: any, x: number, y: number) {
+        peelRef.current?.handleDrag(function (
+          _evt: MouseEvent,
+          x: number,
+          y: number
+        ) {
           peelRef.current.setPeelPosition(x, y);
         });
       }
@@ -79,6 +83,7 @@ function Peel(
     return () => {
       peelRef.current && peelRef.current.removeEvents();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [options]);
 
   useEffect(() => {

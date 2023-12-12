@@ -12,7 +12,7 @@ export default defineConfig((configEnv) => ({
     react(),
     tsConfigPaths(),
     linterPlugin({
-      include: ["./src}/**/*.{ts,tsx}"],
+      include: ["./src/**/*.{ts,tsx}"],
       linters: [new EsLinter({ configEnv })],
     }),
     dts({
@@ -28,6 +28,12 @@ export default defineConfig((configEnv) => ({
     },
     rollupOptions: {
       external: ["react", "react-dom"],
+      output: {
+        globals: {
+          react: "React",
+          "react-dom": "ReactDOM",
+        },
+      },
     },
   },
 }));

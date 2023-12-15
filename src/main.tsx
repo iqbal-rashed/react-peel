@@ -10,7 +10,7 @@ function Example() {
   const handleClick = () => {};
 
   useEffect(() => {
-    console.log("Hello This is the data", ref.current);
+    console.log("Peel", ref.current);
   }, []);
 
   return (

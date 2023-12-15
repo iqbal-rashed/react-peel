@@ -29,4 +29,4 @@ npm install react-peel
 
 ## Contribution
 
-Please make sure to read the [Contributing Guide](https://github.com/iqbal-rashed/react-peel/blob/main/.github/contributing.md) before making a pull request.
+Contributions are welcome! Feel free to check out the [Contributing Guide](https://github.com/iqbal-rashed/react-peel/blob/main/.github/contributing.md) before making a pull request.

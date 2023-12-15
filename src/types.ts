@@ -1,4 +1,4 @@
-import { MutableRefObject, ReactNode, SVGProps } from "react";
+import { MutableRefObject, ReactNode } from "react";
 import { PeelCorners } from "./peel";
 
 export interface PeelOptions {

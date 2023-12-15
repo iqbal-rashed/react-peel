@@ -16,11 +16,11 @@ export default defineConfig({
         items: [
           {
             text: "Changelog",
-            link: "https://github.com/sanyuan0704/island.js/blob/master/CHANGELOG.md",
+            link: `https://github.com/iqbal-rashed/react-peel/releases/tag/v${version}`,
           },
           {
             text: "Contributing",
-            link: "https://github.com/sanyuan0704/island.js/blob/master/.github/contributing.md",
+            link: "https://github.com/iqbal-rashed/react-peel/blob/main/.github/contributing.md",
           },
         ],
       },

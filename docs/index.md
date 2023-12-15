@@ -18,12 +18,12 @@ hero:
 
 features:
   - title: "Feature Rich: The powerful features"
-    details: Out of box support for i18n, full-text search etc.
+    details: Packed with powerful features to enhance your experience.
     icon: 🚀
   - title: "TypeScript: Typed API Support"
-    details: Written in TypeScript, with type definitions for APIs.
+    details: Enjoy the benefits of a typed API for better development support.
     icon: 📦
-  - title: "Customizable: The flexible way to customize"
-    details: You can customize the theme ui and the build process.
-    icon: 🎨
+  - title: "Simple: Easy to Implement"
+    details: Implementation is a breeze, complete with a straightforward description.
+    icon: ✨
 ---

@@ -1,0 +1,129 @@
+# Api
+
+## Props
+
+### `ref`
+
+```typescript
+MutableRefObject<any> | undefined;
+```
+
+Reference to the Peel object, containing values and methods.
+
+### `className`
+
+```typescript
+string | undefined;
+```
+
+Represents the class of PeelWrapper.
+
+### `height`
+
+```typescript
+string | undefined;
+```
+
+Sets the height of PeelWrapper. Default is `100%`.
+
+### `width`
+
+```typescript
+string | undefined;
+```
+
+Sets the height of PeelWrapper. Default is `100%`.
+
+### `options`
+
+The options to pass to the underlying peel.js constructor as listed [here](https://andrewplummer.github.io/peel-js/#options).
+
+### `options.shape`
+
+```typescript
+SvgElementProps | undefined;
+```
+
+Any SVG element can be specified here which will create a subclip for the effect and allow custom shapes to be used. <a href="examples#circle">See the examples for more</a>
+
+### `peelPosition`
+
+```typescript
+{ x: number, y: number } | undefined
+```
+
+The position of the peel effect. This point is the position of the corner that is being peeled back.
+
+### `corner`
+
+```typescript
+{ x: number, y: number } | "TOP_LEFT" | "TOP_RIGHT" | "BOTTOM_LEFT" | "BOTTOM_RIGHT" | undefined
+```
+
+The corner for the effect to peel back from. Can be 2 arguments as x,y coordinates or a single argument as a corner name. Default is the bottom right corner.
+
+### `constraints`
+
+```typescript
+{ x: number, y: number } | | "TOP_LEFT" | "TOP_RIGHT" | "BOTTOM_LEFT" | "BOTTOM_RIGHT" | undefined | Array<{ x: number, y: number } | | "TOP_LEFT" | "TOP_RIGHT" | "BOTTOM_LEFT" | "BOTTOM_RIGHT" | undefined>
+```
+
+List of constraints on the distance of the peel. This can be thought of as points on the layers that are connected and cannot be torn apart. Typically this only makes sense as a point on the outer edge, such as the left edge of an open book, or the top edge of a calendar. In this case, simply using 2 constraint points (top-left/bottom-left for a book, etc) will create the desired effect. An arbitrary point can also be used with an effect like a thumbtack holding the pages together. Can be 2 arguments as x,y coordinates or a single argument as a corner name.
+
+### `drag`
+
+```typescript
+boolean | undefined;
+```
+
+A shorthand for setting the `@drag` event to set the peel position to the mouse.
+
+### `mode`
+
+```typescript
+"book" | "calendar" | undefined;
+```
+
+A shortcut for setting predefined `constraints`. Currently `"book"` and `"calendar"`.
+
+### `fadeThreshold`
+
+```typescript
+number | undefined;
+```
+
+A threshold above which the top layer (including the backside) layer will begin to fade out. The threshold is between 0 (no peel) and 1 (top layer is fully peeled off) and is calculated based on the visible clipped area. If a peel path is set, it will use the progress along the path instead.
+
+### `timeAlongPath`
+
+```typescript
+number | undefined;
+```
+
+Sets the peel effect to a point in time (between 0 and 1) along a previously specified path. Will throw an error if no path exists.
+
+### `peelPath`
+
+```typescript
+number[] | undefined
+```
+
+A path along which the peel will follow. This can be a flat line segment (represented by 4 arguments: x1, y1, x2, y2) or a bezier curve (represented by 8 arguments: x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2 where cp1 and cp2 are the 2 bezier control points, similar to the [bezierCurveTo](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes#Cubic_Bezier_curves) canvas method.)
+
+## Events
+
+### `handleDrag`
+
+```typescript
+(event: MouseEvent, x: number, y: number, peel: any) => any | undefined;
+```
+
+Sets a function to be called when the user drags, either with a mouse or with a finger (using touch events).
+
+### `handlePress`
+
+```typescript
+(event: MouseEvent, peel: any) => any | undefined;
+```
+
+Sets a function to be called when the user either clicks with a mouse or taps with a finger.

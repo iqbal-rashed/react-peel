@@ -2,7 +2,9 @@ import { PeelBack, PeelBottom, PeelWrapper, PeelTop } from "../../src/index";
 
 # Examples
 
-## Simple
+## Static Examples
+
+### Simple
 
 Simplest possible example. 3 elements define the 3 layers used. A constructor sets up the effect, and a call to setPeelPosition tells it where to peel back to:
 
@@ -22,7 +24,7 @@ Simplest possible example. 3 elements define the 3 layers used. A constructor se
 </PeelWrapper>
 ```
 
-## Corner
+### Corner
 
 Any corner can be used for the peel effect:
 
@@ -56,7 +58,7 @@ Any corner can be used for the peel effect:
 </PeelWrapper>
 ```
 
-## Shadows
+### Shadows
 
 The shadow effects can be controlled through various options to the constructor (options listed below):
 
@@ -99,7 +101,7 @@ The shadow effects can be controlled through various options to the constructor 
 </PeelWrapper>
 ```
 
-## Reflection
+### Reflection
 
 Adding a back reflection gives the peel a shiny effect. Reflection strength can be controller in the constructor options (see below):
 
@@ -138,7 +140,56 @@ Adding a back reflection gives the peel a shiny effect. Reflection strength can 
 </PeelWrapper>
 ```
 
-## Path
+### Circle
+
+SVG shapes can also be used for clipping effects:
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{  
+      shape:{
+  circle: {
+    cx: 100,
+    cy: 100,
+    r: 100
+  }}
+
+    }}
+    peelPosition={{ x: 100, y: 80 }}
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper
+  height={200}
+  width={200}
+  options={{
+    shape: {
+      circle: {
+        cx: 100,
+        cy: 100,
+        r: 100,
+      },
+    },
+  }}
+  peelPosition={{ x: 100, y: 80 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+### Path
 
 More complex shapes such as paths can create custom shapes:
 
@@ -184,7 +235,9 @@ More complex shapes such as paths can create custom shapes:
 </PeelWrapper>
 ```
 
-## Dragging
+## Dynamic Examples
+
+### Dragging
 
 Allowing the user to drag the effect by mouse or touch.
 
@@ -211,7 +264,7 @@ Allowing the user to drag the effect by mouse or touch.
 </PeelWrapper>
 ```
 
-## Dragging Heart
+### Dragging Heart
 
 Dragging works on custom shapes as well. Note that the corner point can be set anywhere, allowing the effect to precisely follow the mouse cursor.
 
@@ -259,7 +312,7 @@ Dragging works on custom shapes as well. Note that the corner point can be set a
 </PeelWrapper>
 ```
 
-## Constraining
+### Constraining
 
 The peeling effect can be constrained at any point. This can be thought of as a point on the layers that are connected and cannot be torn apart:
 
@@ -287,7 +340,7 @@ The peeling effect can be constrained at any point. This can be thought of as a 
 </PeelWrapper>
 ```
 
-## Page turning effect
+### Page turning effect
 
 Any number of corners can be constrained. Most often this is used to create a book-like effect, which there is a shortcut for:
 
@@ -315,7 +368,7 @@ Any number of corners can be constrained. Most often this is used to create a bo
 </PeelWrapper>
 ```
 
-## Fade threshold
+### Fade threshold
 
 The top layer can be faded out past a threshold which represents the clipped area of the top layer.
 
@@ -343,7 +396,7 @@ The top layer can be faded out past a threshold which represents the clipped are
 </PeelWrapper>
 ```
 
-## Fading out
+### Fading out
 
 Using the getAmountClipped method gives you greater control over behavior, such as stopping the effect after the top layer has been removed.
 
@@ -386,7 +439,7 @@ Using the getAmountClipped method gives you greater control over behavior, such 
 </PeelWrapper>
 ```
 
-## Setting a peel path
+### Setting a peel path
 
 Sometimes you want the peel animation to follow an exact path rather than being unrestricted. The setPeelPath and setTimeAlongPath methods can accomplish this.
 
@@ -425,7 +478,7 @@ Sometimes you want the peel animation to follow an exact path rather than being 
 </PeelWrapper>
 ```
 
-## Peel path as a bezier curve
+### Peel path as a bezier curve
 
 Sometimes you want the peel animation to follow an exact path rather than being unrestricted. The setPeelPath and setTimeAlongPath methods can accomplish this.
 
@@ -464,5 +517,8 @@ Sometimes you want the peel animation to follow an exact path rather than being 
 </PeelWrapper>
 ```
 
-More examples comming soon...
+## Animated Examples
+
+Comming soon...
+
 Or you can help me to add more examples

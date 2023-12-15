@@ -171,8 +171,8 @@ function Peel(
       className={"peel " + props?.className}
       {...containerProps}
       style={{
-        height: props.height,
-        width: props.width,
+        height: props.height || "100%",
+        width: props.width || "100%",
         ...containerProps?.style,
       }}
     >
@@ -187,6 +187,7 @@ function normalizeOptions(options: PeelOptions) {
       ? peelCornersValue(options.corner)
       : undefined;
   }
+
   return options;
 }
 

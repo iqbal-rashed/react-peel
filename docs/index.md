@@ -6,7 +6,7 @@ hero:
   text: A React wrapper for peel.js
   tagline: A react library for creating beautiful peeling effect.
   image:
-    src: /logo.png
+    src: logo.png
     alt: React Peel
   actions:
     - theme: brand

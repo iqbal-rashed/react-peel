@@ -87,18 +87,6 @@ function Peel(
       }
     }
 
-    function addPeelConstraint(cons: Props["constraints"]) {
-      if (isPeelCorners(cons)) {
-        peelRef.current.addPeelConstraint(peelCornersValue(cons));
-      } else if (
-        Object.prototype.hasOwnProperty.call(cons, "x") &&
-        Object.prototype.hasOwnProperty.call(cons, "y")
-      ) {
-        const t = cons as TCoords;
-        peelRef.current.addPeelConstraint(t.x, t.y);
-      }
-    }
-
     initialize();
     return () => {
       peelRef.current && peelRef.current.removeEvents();
@@ -152,6 +140,30 @@ function Peel(
       peelRef.current.setFadeThreshold(props.fadeThreshold);
     }
   }, [props.fadeThreshold]);
+
+  useEffect(() => {
+    if (props.constraints) {
+      if (Array.isArray(props.constraints)) {
+        props.constraints.forEach((constraint) => {
+          addPeelConstraint(constraint);
+        });
+      } else {
+        addPeelConstraint(props.constraints);
+      }
+    }
+  }, [props.constraints]);
+
+  function addPeelConstraint(cons: Props["constraints"]) {
+    if (isPeelCorners(cons)) {
+      peelRef.current.addPeelConstraint(peelCornersValue(cons));
+    } else if (
+      Object.prototype.hasOwnProperty.call(cons, "x") &&
+      Object.prototype.hasOwnProperty.call(cons, "y")
+    ) {
+      const t = cons as TCoords;
+      peelRef.current.addPeelConstraint(t.x, t.y);
+    }
+  }
 
   return (
     <div

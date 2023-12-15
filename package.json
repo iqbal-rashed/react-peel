@@ -38,7 +38,7 @@
   "bugs": {
     "url": "https://github.com/iqbal-rashed/react-peel/issues"
   },
-  "homepage": "https://github.com/iqbal-rashed/react-peel",
+  "homepage": "https://iqbal-rashed.github.io/react-peel",
   "peerDependencies": {
     "react": "16.8.0 || >=17.x || >=18.x",
     "react-dom": "16.8.0 || >=17.x || >=18.x"

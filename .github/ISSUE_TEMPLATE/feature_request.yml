@@ -35,7 +35,7 @@ body:
       label: Validations
       description: Before submitting the issue, please make sure you do the following
       options:
-        - label: Read the [docs](https://example.vercel).
+        - label: Read the [docs](https://iqbal-rashed.github.io/react-peel).
           required: true
         - label: Read the [Contributing Guidelines](https://github.com/iqbal-rashed/react-peel/blob/main/.github/contributing.md).
           required: true

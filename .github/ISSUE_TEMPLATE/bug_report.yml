@@ -35,7 +35,7 @@ body:
       options:
         - label: Check if you're on the [latest React-Peel version](https://github.com/iqbal-rashed/react-peel/releases/latest).
           required: true
-        - label: Read the [docs](https://example.vercel).
+        - label: Read the [docs](https://iqbal-rashed.github.io/react-peel).
           required: true
         - label: Check that there isn't already an issue that reports the same bug to avoid creating a duplicate.
           required: true

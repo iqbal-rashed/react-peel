@@ -7,9 +7,9 @@
 
 ## About
 
-_This is a React wrapper around the peel.js library originally created by Andrew Plummer in 2014._
+_This is a React wrapper around the [peel.js](https://github.com/andrewplummer/peel-js) library originally created by Andrew Plummer in 2014._
 
-## **Check out the docs at https://example.docs**
+## **Check out the docs at https://iqbal-rashed.github.io/react-peel**
 
 ## Installation
 

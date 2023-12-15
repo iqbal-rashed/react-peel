@@ -26,3 +26,7 @@ npm install react-peel
   <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
 </PeelWrapper>
 ```
+
+## Contribution
+
+Please make sure to read the [Contributing Guide](https://github.com/iqbal-rashed/react-peel/blob/main/.github/contributing.md) before making a pull request.

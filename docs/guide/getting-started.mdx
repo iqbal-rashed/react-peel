@@ -1,10 +1,31 @@
 import { PeelBack, PeelBottom, PeelWrapper, PeelTop } from "../../src/index";
 
-<PeelWrapper            
-  height={200}
-  width={200}
-  drag>
+# Getting Started
+
+Currently supported by all browsers that support CSS clip paths and transforms (generally most evergreen browsers including mobile, but excluding IE). No dependencies.
+
+## Installation
+
+```sh
+npm install react-peel
+```
+
+## Basic Usage
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper height={200} width={200} drag>
     <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
     <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
     <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
-</PeelWrapper>
+  </PeelWrapper>
+</div>
+
+```jsx
+<div style={{ padding: "20px" }}>
+  <PeelWrapper height={200} width={200} drag>
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+  </PeelWrapper>
+</div>
+```

@@ -1,4 +1,4 @@
-import { MutableRefObject, ReactNode } from "react";
+import { MutableRefObject, ReactNode, SVGProps } from "react";
 import { PeelCorners } from "./peel";
 
 export interface PeelOptions {
@@ -20,7 +20,7 @@ export interface PeelOptions {
   backShadowOffset?: number;
   backShadowAlpha?: number;
   backShadowDistribute?: boolean;
-  corner?: (typeof PeelCorners)[keyof typeof PeelCorners];
+  corner?: keyof typeof PeelCorners;
   bottomShadow?: boolean;
   bottomShadowSize?: number;
   bottomShadowOffset?: number;
@@ -32,6 +32,7 @@ export interface PeelOptions {
   clippingBoxScale?: number;
   flipConstraintOffset?: number;
   dragPreventsDefault?: boolean;
+  shape?: SvgElementProps;
 }
 
 export type TCoords = { x: number; y: number };
@@ -40,6 +41,41 @@ export type HtmlDivProps = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
   HTMLDivElement
 >;
+
+type CircleProps = {
+  cx: number;
+  cy: number;
+  r: number;
+} & {
+  [key: string]: any;
+};
+type PathProps = {
+  d: string;
+} & {
+  [key: string]: any;
+};
+
+type RectProps = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+} & {
+  [key: string]: any;
+};
+
+type PolygonProps = {
+  points: string;
+} & {
+  [key: string]: any;
+};
+
+type SvgElementProps = {
+  circle?: CircleProps;
+  path?: PathProps;
+  rect?: RectProps;
+  polygon?: PolygonProps;
+};
 
 export type Props = {
   ref?: MutableRefObject<any>;
@@ -50,10 +86,14 @@ export type Props = {
   options?: PeelOptions;
   peelPosition?: TCoords;
   corner?: TCoords | keyof typeof PeelCorners;
-  constraints?: Array<TCoords | (typeof PeelCorners)[keyof typeof PeelCorners]>;
+  constraints?:
+    | TCoords
+    | keyof typeof PeelCorners
+    | Array<TCoords | keyof typeof PeelCorners>;
   timeAlongPath?: number;
   drag?: boolean;
-  handleDrag?: (event: MouseEvent, x: number, y: number) => any;
+  handleDrag?: (event: MouseEvent, x: number, y: number, peel: any) => any;
+  handlePress?: (event: MouseEvent, peel: any) => any;
   mode?: "book" | "calendar";
   fadeThreshold?: number;
   peelPath?: number[];

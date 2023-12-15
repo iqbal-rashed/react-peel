@@ -1,7 +1,7 @@
 import { useRef, useEffect, forwardRef } from "react";
 
 import PeelLib, { PeelCorners } from "./peel";
-import { HtmlDivProps, Props, TCoords } from "./types";
+import { HtmlDivProps, PeelOptions, Props, TCoords } from "./types";
 
 export const PeelWrapper = forwardRef(Peel);
 
@@ -18,7 +18,7 @@ function Peel(
     function initialize() {
       if (!ref.current) return;
       const PeelJs = PeelLib();
-      const p = new PeelJs(ref.current, options);
+      const p = new PeelJs(ref.current, normalizeOptions(options));
       peelRef.current = p;
 
       if (refer) {
@@ -39,17 +39,19 @@ function Peel(
         ) {
           const { x, y } = props.corner as TCoords;
           peelRef.current.setCorner(x, y);
-        } else {
-          peelRef.current.setCorner(
-            PeelCorners[props.corner as keyof typeof PeelCorners]
-          );
+        } else if (isPeelCorners(props.corner)) {
+          peelRef.current.setCorner(peelCornersValue(props.corner));
         }
       }
 
       if (props.constraints) {
-        props.constraints.forEach((constraint) => {
-          peelRef.current.addPeelConstraint(constraint);
-        });
+        if (Array.isArray(props.constraints)) {
+          props.constraints.forEach((constraint) => {
+            addPeelConstraint(constraint);
+          });
+        } else {
+          addPeelConstraint(props.constraints);
+        }
       }
 
       if (props.mode) {
@@ -74,7 +76,26 @@ function Peel(
         });
       }
       if (props.handleDrag) {
-        peelRef.current?.handleDrag(props.handleDrag);
+        peelRef.current?.handleDrag((evt: MouseEvent, x: number, y: number) =>
+          props.handleDrag?.(evt, x, y, peelRef.current)
+        );
+      }
+      if (props.handlePress) {
+        peelRef.current?.handlePress((evt: MouseEvent) =>
+          props.handlePress?.(evt, peelRef.current)
+        );
+      }
+    }
+
+    function addPeelConstraint(cons: Props["constraints"]) {
+      if (isPeelCorners(cons)) {
+        peelRef.current.addPeelConstraint(peelCornersValue(cons));
+      } else if (
+        Object.prototype.hasOwnProperty.call(cons, "x") &&
+        Object.prototype.hasOwnProperty.call(cons, "y")
+      ) {
+        const t = cons as TCoords;
+        peelRef.current.addPeelConstraint(t.x, t.y);
       }
     }
 
@@ -108,11 +129,8 @@ function Peel(
       ) {
         const { x, y } = props.corner as TCoords;
         peelRef.current.setCorner(x, y);
-      } else {
-        console.log(PeelCorners[props.corner as keyof typeof PeelCorners]);
-        peelRef.current.setCorner(
-          PeelCorners[props.corner as keyof typeof PeelCorners]
-        );
+      } else if (isPeelCorners(props.corner)) {
+        peelRef.current.setCorner(peelCornersValue(props.corner));
       }
     }
   }, [props.corner]);
@@ -149,6 +167,24 @@ function Peel(
       {children}
     </div>
   );
+}
+
+function normalizeOptions(options: PeelOptions) {
+  if (options.corner) {
+    options.corner = isPeelCorners(options.corner)
+      ? peelCornersValue(options.corner)
+      : undefined;
+  }
+  return options;
+}
+
+function isPeelCorners(value: any) {
+  return Object.keys(PeelCorners).includes(value);
+}
+
+function peelCornersValue(value: any) {
+  const pValue = PeelCorners[value as keyof typeof PeelCorners];
+  return pValue as any;
 }
 
 PeelWrapper.displayName = "PeelWrapper";

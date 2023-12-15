@@ -12,15 +12,6 @@ export default defineConfig({
         activeMatch: "/guide/",
       },
       {
-        text: "Example",
-        link: `/example/`,
-      },
-      {
-        text: "Api",
-        link: "/api/",
-        activeMatch: "/api/",
-      },
-      {
         text: `v${version}`,
         items: [
           {
@@ -41,5 +32,26 @@ export default defineConfig({
         content: "https://github.com/iqbal-rashed/react-peel",
       },
     ],
+    sidebar: {
+      "/guide/": [
+        {
+          text: "Guide",
+          items: [
+            {
+              text: "Getting Started",
+              link: "/guide/getting-started",
+            },
+            {
+              text: "Examples",
+              link: "/guide/examples",
+            },
+            {
+              text: "Api",
+              link: "/guide/api",
+            },
+          ],
+        },
+      ],
+    },
   },
 });

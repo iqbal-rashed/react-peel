@@ -5,7 +5,7 @@ import { PeelBack, PeelBottom, PeelTop, PeelWrapper } from ".";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function Example() {
-  const ref = useRef();
+  const ref = useRef<any>(null);
 
   const handleClick = () => {};
 
@@ -17,7 +17,15 @@ function Example() {
     <div>
       <button onClick={handleClick}>Click me</button>
       <div>
-        <PeelWrapper height={200} width={200} ref={ref} drag>
+        <PeelWrapper
+          height={200}
+          width={200}
+          ref={ref}
+          constraints={[{ x: 200, y: 200 }]}
+          options={{ corner: "TOP_LEFT" }}
+          peelPosition={{ x: 100, y: 100 }}
+          drag
+        >
           <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
           <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
           <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>

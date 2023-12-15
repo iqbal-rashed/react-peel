@@ -1,27 +1,28 @@
-# React + TypeScript + Vite
+# React Peel
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<div style="text-align: center; margin: auto;">
+  <img src="docs/public/logo.png" height="200" style="object-fit: contain;">
 
-Currently, two official plugins are available:
+</div>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## About
 
-## Expanding the ESLint configuration
+_This is a React wrapper around the peel.js library originally created by Andrew Plummer in 2014._
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## **Check out the docs at https://example.docs**
 
-- Configure the top-level `parserOptions` property like this:
+## Installation
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
+```sh
+npm install react-peel
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Basic usage
+
+```jsx
+<PeelWrapper height={200} width={200} drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```

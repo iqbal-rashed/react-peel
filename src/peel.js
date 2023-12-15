@@ -748,7 +748,9 @@ export default function () {
     var shapes = ["rect", "polygon", "path", "circle"],
       found;
     shapes.some(function (type) {
-      var attr = this.getOption(type),
+      let shapeObj = this.getOption("shape");
+      let getShape = shapeObj && shapeObj[type];
+      var attr = getShape,
         obj;
       if (attr) {
         obj = {};

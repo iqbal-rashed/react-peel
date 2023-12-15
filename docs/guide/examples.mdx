@@ -1,0 +1,468 @@
+import { PeelBack, PeelBottom, PeelWrapper, PeelTop } from "../../src/index";
+
+# Examples
+
+## Simple
+
+Simplest possible example. 3 elements define the 3 layers used. A constructor sets up the effect, and a call to setPeelPosition tells it where to peel back to:
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper height={200} width={200} peelPosition={{ x: 80, y: 120 }}>
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper height={200} width={200} peelPosition={{ x: 80, y: 120 }}>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Corner
+
+Any corner can be used for the peel effect:
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    corner={"TOP_LEFT"}
+    peelPosition={{ x: 80, y: 70 }}
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper
+  height={200}
+  width={200}
+  // options={{ corner: "TOP_LEFT" }}
+  corner={"TOP_LEFT"}
+  peelPosition={{ x: 80, y: 70 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Shadows
+
+The shadow effects can be controlled through various options to the constructor (options listed below):
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{  
+      topShadow: false,
+      backShadowSize: .12,
+      bottomShadowDarkAlpha: 1,
+      bottomShadowLightAlpha: .4
+    }}
+    peelPosition={{ x: 150, y: 0 }}
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper
+  height={200}
+  width={200}
+  options={{
+    topShadow: false,
+    backShadowSize: 0.12,
+    bottomShadowDarkAlpha: 1,
+    bottomShadowLightAlpha: 0.4,
+  }}
+  peelPosition={{ x: 150, y: 0 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Reflection
+
+Adding a back reflection gives the peel a shiny effect. Reflection strength can be controller in the constructor options (see below):
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{  
+      backReflection: true,
+      backReflectionAlpha: .3
+    }}
+    peelPosition={{ x: 150, y: 0 }}
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper
+  height={200}
+  width={200}
+  options={{
+    backReflection: true,
+    backReflectionAlpha: 0.3,
+  }}
+  peelPosition={{ x: 150, y: 0 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Path
+
+More complex shapes such as paths can create custom shapes:
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{  
+      shape:{
+      path: {
+        d: "M101.260605,31.4241113 C122.403839,-11.2687842 173.108983,1.11145064 183.007355,11.8447551 C237.311569,70.7295532 142.521446,119.347653 101.260608,174.571349 C51.8099036,119.347653 -39.0680406,68.307428 18.4502396,11.8447553 C33.183089,-2.61770866 77.7850024,-11.2687842 101.260605,31.4241113 Z",
+      },
+      }
+
+    }}
+    peelPosition={{ x: 150, y: 0 }}
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper
+  height={200}
+  width={200}
+  options={{
+    shape: {
+      path: {
+        d: "M101.260605,31.4241113 C122.403839,-11.2687842 173.108983,1.11145064 183.007355,11.8447551 C237.311569,70.7295532 142.521446,119.347653 101.260608,174.571349 C51.8099036,119.347653 -39.0680406,68.307428 18.4502396,11.8447553 C33.183089,-2.61770866 77.7850024,-11.2687842 101.260605,31.4241113 Z",
+      },
+    },
+  }}
+  peelPosition={{ x: 150, y: 0 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Dragging
+
+Allowing the user to drag the effect by mouse or touch.
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+  drag
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper height={200} width={200} drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Dragging Heart
+
+Dragging works on custom shapes as well. Note that the corner point can be set anywhere, allowing the effect to precisely follow the mouse cursor.
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{  
+      shape:{
+      path: {
+        d: "M101.260605,31.4241113 C122.403839,-11.2687842 173.108983,1.11145064 183.007355,11.8447551 C237.311569,70.7295532 142.521446,119.347653 101.260608,174.571349 C51.8099036,119.347653 -39.0680406,68.307428 18.4502396,11.8447553 C33.183089,-2.61770866 77.7850024,-11.2687842 101.260605,31.4241113 Z",
+      },
+      }
+
+    }}
+    corner={{x:101,y:175}}
+    drag
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper
+  height={200}
+  width={200}
+  options={{
+    shape: {
+      path: {
+        d: "M101.260605,31.4241113 C122.403839,-11.2687842 173.108983,1.11145064 183.007355,11.8447551 C237.311569,70.7295532 142.521446,119.347653 101.260608,174.571349 C51.8099036,119.347653 -39.0680406,68.307428 18.4502396,11.8447553 C33.183089,-2.61770866 77.7850024,-11.2687842 101.260605,31.4241113 Z",
+      },
+    },
+  }}
+  corner={{ x: 101, y: 175 }}
+  drag
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Constraining
+
+The peeling effect can be constrained at any point. This can be thought of as a point on the layers that are connected and cannot be torn apart:
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    constraints={"BOTTOM_LEFT"}
+    drag
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper height={200} width={200} constraints={"BOTTOM_LEFT"} drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Page turning effect
+
+Any number of corners can be constrained. Most often this is used to create a book-like effect, which there is a shortcut for:
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={160}
+    width={130}
+    mode="book"
+    drag
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper height={160} width={130} mode="book" drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Fade threshold
+
+The top layer can be faded out past a threshold which represents the clipped area of the top layer.
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    fadeThreshold={.9}
+    drag
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper height={200} width={200} fadeThreshold={0.9} drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Fading out
+
+Using the getAmountClipped method gives you greater control over behavior, such as stopping the effect after the top layer has been removed.
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    fadeThreshold={.9}
+    handleDrag={(evt,x,y,p)=>{
+        p.setPeelPosition(x, y);
+      if (p.getAmountClipped() === 1) {
+        p.removeEvents();
+      }
+    }}
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper
+  height={200}
+  width={200}
+  fadeThreshold={0.9}
+  handleDrag={(evt, x, y, peel) => {
+    peel.setPeelPosition(x, y);
+    if (peel.getAmountClipped() === 1) {
+      peel.removeEvents();
+    }
+  }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Setting a peel path
+
+Sometimes you want the peel animation to follow an exact path rather than being unrestricted. The setPeelPath and setTimeAlongPath methods can accomplish this.
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    peelPath={[200,200,-200,-200]}
+    handleDrag={(evt,x,y,p)=>{
+      const t = (x - p.width) / -p.width;
+      p.setTimeAlongPath(t);
+    }}
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper
+  height={200}
+  width={200}
+  peelPath={[200, 200, -200, -200]}
+  handleDrag={(evt, x, y, p) => {
+    const t = (x - p.width) / -p.width;
+    p.setTimeAlongPath(t);
+  }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+## Peel path as a bezier curve
+
+Sometimes you want the peel animation to follow an exact path rather than being unrestricted. The setPeelPath and setTimeAlongPath methods can accomplish this.
+
+<div style={{ padding: "20px" }}>
+  <PeelWrapper
+    height={160}
+    width={130}
+    peelPath={[130, 160, 50, 60, -70, 210, -130, 160]}
+    handleDrag={(evt,x,y,p)=>{
+      let t = (x - p.width) / (-p.width * 2);
+      p.setTimeAlongPath(t);
+    }}
+
+>
+
+    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+
+  </PeelWrapper>
+</div>
+
+```jsx
+<PeelWrapper
+  height={160}
+  width={130}
+  peelPath={[130, 160, 50, 60, -70, 210, -130, 160]}
+  handleDrag={(evt, x, y, p) => {
+    let t = (x - p.width) / (-p.width * 2);
+    p.setTimeAlongPath(t);
+  }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
+  <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
+  <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+</PeelWrapper>
+```
+
+More examples comming soon...
+Or you can help me to add more examples

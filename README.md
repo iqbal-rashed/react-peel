@@ -11,7 +11,7 @@
 
 The library allows you to create realistic peeling effects in your React applications. It comes with a set of props and events to customize and control the peeling behavior.
 
-## **Check out the docs at https://iqbal-rashed.github.io/react-peel**
+## **Check out the docs at https://react-peel.vercel.app**
 
 ## Installation
 

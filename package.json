@@ -1,7 +1,7 @@
 {
   "name": "react-peel",
   "description": "react-peel is a react library to create realistic peeling effects. No dependencies.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "scripts": {
     "dev": "vite",

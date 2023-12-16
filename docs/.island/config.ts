@@ -3,8 +3,6 @@ const version = require("../../package.json").version;
 
 export default defineConfig({
   title: "React Peel",
-  enableSpa: true,
-
   themeConfig: {
     nav: [
       {

@@ -7,6 +7,10 @@
 
 <br>
 
+> Important Note: This is the first release of the library, so if you encounter any issues, please submit them. Your feedback is greatly appreciated. Contributors are also welcome!
+
+[<img src="https://img.shields.io/badge/React Peel - JS-010101?&style=for-the-badge&logo=Npm"/>](https://www.npmjs.com/package/react-peel)
+
 `react-peel` is a React library that serves as a wrapper around the [peel.js](https://github.com/andrewplummer/peel-js) library created by Andrew Plummer.
 
 The library allows you to create realistic peeling effects in your React applications. It comes with a set of props and events to customize and control the peeling behavior.

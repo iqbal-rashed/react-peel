@@ -1,4 +1,4 @@
-import { useRef, useEffect, forwardRef } from "react";
+import { forwardRef, useEffect, useRef } from "react";
 
 import PeelLib, { PeelCorners } from "./peel";
 import { HtmlDivProps, PeelOptions, Props, TCoords } from "./types";
@@ -89,7 +89,7 @@ function Peel(
 
     initialize();
     return () => {
-      peelRef.current && peelRef.current.removeEvents();
+      peelRef.current && peelRef.current.clear();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [options]);

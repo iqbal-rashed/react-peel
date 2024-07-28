@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom/client";
-import { useRef, useEffect } from "react";
 import { PeelBack, PeelBottom, PeelTop, PeelWrapper } from ".";
 
 // eslint-disable-next-line react-refresh/only-export-components

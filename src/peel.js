@@ -137,8 +137,8 @@ export default function () {
 
   // Event Helpers
 
-  function addEvent(el, type, fn) {
-    el.addEventListener(type, fn);
+  function addEvent(el, type, fn, opt) {
+    el.addEventListener(type, fn, opt);
   }
 
   function removeEvent(el, type, fn) {
@@ -442,9 +442,39 @@ export default function () {
     }
 
     this.addEvent(el, "mousedown", dragStart.bind(this, false));
-    this.addEvent(el, "touchstart", dragStart.bind(this, true));
+    this.addEvent(
+      el,
+      "touchstart",
+      dragStart.bind(this, true),
+      checkPassiveEventSupport()
+        ? {
+            passive: true,
+          }
+        : false
+    );
     this.dragEventsSetup = true;
   };
+
+  /**
+   * Check passive event listener browser compatibility.
+   * @public
+   */
+
+  function checkPassiveEventSupport() {
+    let supportsPassive = false;
+    try {
+      const options = Object.defineProperty({}, "passive", {
+        get: function () {
+          supportsPassive = true;
+          return null;
+        },
+      });
+      window.addEventListener("test", null, options);
+    } catch (err) {
+      console.warn("Passive event listener not support");
+    }
+    return supportsPassive;
+  }
 
   /**
    * Remove all event handlers previously added to the instance.
@@ -455,6 +485,27 @@ export default function () {
       removeEvent(e.el, e.type, e.handler);
     });
     this.events = [];
+  };
+
+  /**
+   * Remove global svg elements.
+   * @public
+   */
+  Peel.prototype.removeGlobalSvgElements = function () {
+    var globalSvgElements = document.getElementsByClassName(
+      prefix("svg-clip-element")
+    );
+
+    [...globalSvgElements].forEach((e) => e.remove());
+  };
+
+  /**
+   * Clear everything.
+   * @public
+   */
+  Peel.prototype.clear = function () {
+    this.removeEvents();
+    this.removeGlobalSvgElements();
   };
 
   /**
@@ -562,8 +613,8 @@ export default function () {
    * @param {Function} fn The handler function.
    * @private
    */
-  Peel.prototype.addEvent = function (el, type, fn) {
-    addEvent(el, type, fn);
+  Peel.prototype.addEvent = function (el, type, fn, opt) {
+    addEvent(el, type, fn, opt);
     this.events.push({
       el: el,
       type: type,
@@ -1277,6 +1328,22 @@ export default function () {
     // Chrome needs this for some reason for the clipping to work.
     setTransform(this.el, "translate(0px,0px)");
   }
+
+  // /**
+  //  * Sets up the global SVG element and its nested defs object to use for new
+  //  * clip paths.
+  //  * @returns {SVGElement}
+  //  * @public
+  //  */
+  // SVGClip.getGlobalSvgElement = function () {
+  //   if (!this.defs) {
+  //     this.svg = createSVGElement("svg", null, {
+  //       class: prefix("svg-clip-element"),
+  //     });
+  //     this.defs = createSVGElement("defs", this.svg);
+  //   }
+  //   return this.defs;
+  // };
 
   /**
    * Sets up the global SVG element and its nested defs object to use for new

@@ -4,6 +4,7 @@ import packageJson from "../../package.json";
 export default defineConfig({
   title: "React Peel",
   icon: "/peel.png",
+  base: "/react-peel/",
   themeConfig: {
     nav: [
       {

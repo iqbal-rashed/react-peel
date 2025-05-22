@@ -215,7 +215,7 @@ import{jsx as e,jsxs as n,Fragment as F}from"react/jsx-runtime";import{P as o,a 
 `,e(l.span,{className:"line"})]})})]}),`
 `,n(l.h2,{id:"animated-examples",children:[e(l.a,{className:"header-anchor","aria-hidden":"true",href:"#animated-examples",children:"#"}),"Animated Examples"]}),`
 `,e(l.p,{children:"Comming soon..."}),`
-`,e(l.p,{children:"Or you can help me to add more examples"})]})}function m(t={}){const{wrapper:l}=t.components||{};return l?e(l,Object.assign({},t,{children:e(y,t)})):y(t)}const P="2025/5/22 09:56:43",b=`import { PeelBack, PeelBottom, PeelWrapper, PeelTop } from "../../src/index";
+`,e(l.p,{children:"Or you can help me to add more examples"})]})}function m(t={}){const{wrapper:l}=t.components||{};return l?e(l,Object.assign({},t,{children:e(y,t)})):y(t)}const P="2025/5/22 14:06:42",b=`import { PeelBack, PeelBottom, PeelWrapper, PeelTop } from "../../src/index";
 
 # Examples
 

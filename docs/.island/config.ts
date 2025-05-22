@@ -1,8 +1,9 @@
 import { defineConfig } from "islandjs";
-const version = require("../../package.json").version;
+import packageJson from "../../package.json";
 
 export default defineConfig({
   title: "React Peel",
+  icon: "/peel.png",
   themeConfig: {
     nav: [
       {
@@ -11,11 +12,11 @@ export default defineConfig({
         activeMatch: "/guide/",
       },
       {
-        text: `v${version}`,
+        text: `v${packageJson.version}`,
         items: [
           {
             text: "Changelog",
-            link: `https://github.com/iqbal-rashed/react-peel/releases/tag/v${version}`,
+            link: `https://github.com/iqbal-rashed/react-peel/blob/main/.github/changelog.md`,
           },
           {
             text: "Contributing",

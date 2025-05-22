@@ -1,5 +1,4 @@
-import { forwardRef, useEffect, useRef } from "react";
-
+import React, { forwardRef, useEffect, useRef } from "react";
 import PeelLib, { PeelCorners } from "./peel";
 import { HtmlDivProps, PeelOptions, Props, TCoords } from "./types";
 
@@ -10,7 +9,7 @@ function Peel(
   refer: any
 ) {
   const ref = useRef<HTMLDivElement>(null);
-  const peelRef = useRef<any>();
+  const peelRef = useRef<any>(null);
 
   useInitializeCss();
 
@@ -89,9 +88,10 @@ function Peel(
 
     initialize();
     return () => {
-      peelRef.current && peelRef.current.clear();
+      if (peelRef.current) {
+        peelRef.current.clear();
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [options]);
 
   useEffect(() => {
@@ -251,23 +251,29 @@ const useInitializeCss = () => {
 
 export const PeelTop = forwardRef(function (
   { className, ...props }: HtmlDivProps,
-  ref: React.LegacyRef<HTMLDivElement>
+  ref: React.Ref<HTMLDivElement>
 ) {
   return <div ref={ref} className={"peel-top " + className} {...props}></div>;
 });
 
+PeelTop.displayName = "PeelTop";
+
 export const PeelBack = forwardRef(function (
   { className, ...props }: HtmlDivProps,
-  ref: React.LegacyRef<HTMLDivElement>
+  ref: React.Ref<HTMLDivElement>
 ) {
   return <div ref={ref} className={"peel-back " + className} {...props}></div>;
 });
 
+PeelBack.displayName = "PeelBack";
+
 export const PeelBottom = forwardRef(function (
   { className, ...props }: HtmlDivProps,
-  ref: React.LegacyRef<HTMLDivElement>
+  ref: React.Ref<HTMLDivElement>
 ) {
   return (
     <div ref={ref} className={"peel-bottom " + className} {...props}></div>
   );
 });
+
+PeelBottom.displayName = "PeelBottom";

@@ -1,30 +1,29 @@
 {
   "name": "react-peel",
   "description": "react-peel is a react library to create realistic peeling effects. No dependencies.",
-  "version": "0.1.3",
-  "type": "module",
+  "version": "2.0.0",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
+    "build": "tsup",
+    "lint": "eslint . --max-warnings 0",
     "dev:docs": "island dev docs",
     "build:docs": "island build docs",
-    "preview:docs": "island start docs"
+    "preview:docs": "island start docs",
+    "prepare": "husky"
   },
   "files": [
     "dist"
   ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/react-peel.es.js",
-      "require": "./dist/react-peel.umd.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     }
   },
-  "main": "./dist/react-peel.umd.js",
-  "module": "./dist/react-peel.es.js",
-  "types": "./dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/iqbal-rashed/react-peel"
@@ -33,31 +32,36 @@
     "react-peel",
     "peel.js",
     "peel animation",
-    "react"
+    "react",
+    "react-animation",
+    "page peel",
+    "page curl",
+    "peel effect",
+    "react-effects",
+    "animation library",
+    "interactive UI",
+    "react-component",
+    "ui-animation"
   ],
   "bugs": {
     "url": "https://github.com/iqbal-rashed/react-peel/issues"
   },
   "homepage": "https://iqbal-rashed.github.io/react-peel",
   "peerDependencies": {
-    "react": "16.8.0 || >=17.x || >=18.x",
-    "react-dom": "16.8.0 || >=17.x || >=18.x"
+    "react": "16.8.0 || >=17.x",
+    "react-dom": "16.8.0 || >=17.x"
   },
   "devDependencies": {
-    "@types/node": "^20.8.8",
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "@vitejs/plugin-react-swc": "^3.3.2",
-    "eslint": "^8.45.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.3",
+    "@eslint/js": "^9.26.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "eslint": "^9.26.0",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.1.0",
+    "husky": "^9.1.7",
     "islandjs": "^0.7.31",
-    "typescript": "^5.0.2",
-    "vite": "^4.4.5",
-    "vite-plugin-dts": "^3.6.1",
-    "vite-plugin-linter": "^2.0.7",
-    "vite-tsconfig-paths": "^4.2.1"
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.32.0"
   }
 }

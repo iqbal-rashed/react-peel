@@ -1,4 +1,4 @@
-import { MutableRefObject, ReactNode } from "react";
+import { RefObject, ReactNode } from "react";
 import { PeelCorners } from "./peel";
 
 export interface PeelOptions {
@@ -78,7 +78,7 @@ type SvgElementProps = {
 };
 
 export type Props = {
-  ref?: MutableRefObject<any>;
+  ref?: RefObject<any>;
   className?: string;
   height?: string | number;
   width?: string | number;

@@ -1,42 +1,42 @@
 # React Peel
 
 <div style="text-align: center; margin: auto;">
-  <img src="docs/public/logo.png" height="200" style="object-fit: contain;">
-
+  <img src="docs/public/logo.png" height="200" style="object-fit: contain;" alt="React Peel Logo" />
 </div>
 
 <br>
 
-> Important Note: This is the first release of the library, so if you encounter any issues, please submit them. Your feedback is greatly appreciated. Contributors are also welcome!
+> **Important Note:** This is the first release of `react-peel`. If you encounter any issues or have suggestions, please open an issue. Contributions and feedback are highly appreciated!
 
-[<img src="https://img.shields.io/badge/React Peel - JS-010101?&style=for-the-badge&logo=Npm"/>](https://www.npmjs.com/package/react-peel)
+[<img src="https://img.shields.io/badge/React Peel-JS-010101?&style=for-the-badge&logo=Npm" alt="npm package" />](https://www.npmjs.com/package/react-peel)
 
-`react-peel` is a React library that serves as a wrapper around the [peel.js](https://github.com/andrewplummer/peel-js) library created by Andrew Plummer.
+`react-peel` is a React wrapper around the original [peel.js](https://github.com/andrewplummer/peel-js) library by Andrew Plummer. It enables realistic peel effects in React applications with a flexible API to customize and control the peeling behavior.
 
-The library allows you to create realistic peeling effects in your React applications. It comes with a set of props and events to customize and control the peeling behavior.
+## 🌐 Documentation
 
-## **Check out the docs at https://react-peel.vercel.app**
+Explore the full documentation and examples at:  
+**https://iqbal-rashed.github.io/react-peel**
 
 ## Installation
 
-To install `react-peel` in your project, use the following command:
+Install `react-peel` via npm:
 
-```sh
+```bash
 npm install react-peel
 ```
 
-## Basic usage
+## Basic Usage Example
 
 ```jsx
 import React from "react";
-import { PeelWrapper, PeelTop, PeelBottom, PeelBack } from "react-peel";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
 const MyComponent = () => {
   return (
     <PeelWrapper height={200} width={200} drag>
-      <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
-      <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
-      <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
+      <PeelTop style={{ backgroundColor: "#81afcb" }} />
+      <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+      <PeelBottom style={{ backgroundColor: "#688394" }} />
     </PeelWrapper>
   );
 };
@@ -44,28 +44,28 @@ const MyComponent = () => {
 export default MyComponent;
 ```
 
-This basic example demonstrates how to set up a peel effect using react-peel. You can customize the appearance, size, and behavior of the peel by adjusting the props and styles passed to the components within the PeelWrapper.
+This example sets up a peel effect with customizable layers and enables drag interaction. You can style the peel layers and control the peel behavior through the available props.
 
 ## PeelWrapper Props
 
-The `PeelWrapper` component provides the following props to customize the peeling effect:
-
-| Props           | Type                                                                                                                                                                                                                    | Note                                                                                                                                                          |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ref`           | `MutableRefObject<any> \| undefined`                                                                                                                                                                                    | Reference to the Peel object, containing values and methods.                                                                                                  |
-| `className`     | `string \| undefined`                                                                                                                                                                                                   | Represents the class of PeelWrapper.                                                                                                                          |
-| `height`        | `string \| undefined`                                                                                                                                                                                                   | Sets the height of PeelWrapper.                                                                                                                               |
-| `width`         | `string \| undefined`                                                                                                                                                                                                   | Sets the width of PeelWrapper.                                                                                                                                |
-| `options`       | `object \| undefined`                                                                                                                                                                                                   | Options to pass to the underlying peel.js constructor. [See options here](https://andrewplummer.github.io/peel-js/#options).                                  |
-| `peelPosition`  | `{ x: number, y: number } \| undefined`                                                                                                                                                                                 | The position of the peel effect. This point is the position of the corner that is being peeled back.                                                          |
-| `corner`        | `{ x: number, y: number } \| "TOP_LEFT" \| "TOP_RIGHT" \| "BOTTOM_LEFT" \| "BOTTOM_RIGHT" \| undefined`                                                                                                                 | The corner for the effect to peel back from. Can be 2 arguments as x,y coordinates or a single argument as a corner name. Default is the bottom right corner. |
-| `constraints`   | `{ x: number, y: number } \| "TOP_LEFT" \| "TOP_RIGHT" \| "BOTTOM_LEFT" \| "BOTTOM_RIGHT" \| undefined \| Array<{ x: number, y: number } \| "TOP_LEFT" \| "TOP_RIGHT" \| "BOTTOM_LEFT" \| "BOTTOM_RIGHT" \| undefined>` | List of constraints on the distance of the peel. Can be 2 arguments as x,y coordinates or a single argument as a corner name.                                 |
-| `drag`          | `boolean \| undefined`                                                                                                                                                                                                  | A shorthand for setting the `@drag` event to set the peel position to the mouse.                                                                              |
-| `mode`          | `"book" \| "calendar" \| undefined`                                                                                                                                                                                     | A shortcut for setting predefined `constraints`. Currently `"book"` and `"calendar"`.                                                                         |
-| `fadeThreshold` | `number \| undefined`                                                                                                                                                                                                   | A threshold above which the top layer will begin to fade out. The threshold is between 0 (no peel) and 1 (top layer is fully peeled off).                     |
-| `timeAlongPath` | `number \| undefined`                                                                                                                                                                                                   | Sets the peel effect to a point in time (between 0 and 1) along a previously specified path. Will throw an error if no path exists.                           |
-| `peelPath`      | `number[] \| undefined`                                                                                                                                                                                                 | A path along which the peel will follow. This can be a flat line segment or a bezier curve.                                                                   |
+| Prop            | Type                                                                                                    | Description                                                                                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `ref`           | `MutableRefObject<any> \| undefined`                                                                    | Reference to the Peel instance, exposing methods and internal state.                                                                      |
+| `className`     | `string \| undefined`                                                                                   | CSS class applied to the PeelWrapper container.                                                                                           |
+| `height`        | `string \| number \| undefined`                                                                         | Sets the height of the peel container.                                                                                                    |
+| `width`         | `string \| number \| undefined`                                                                         | Sets the width of the peel container.                                                                                                     |
+| `options`       | `object \| undefined`                                                                                   | Configuration options passed to the underlying peel.js instance. [See peel.js options](https://andrewplummer.github.io/peel-js/#options). |
+| `peelPosition`  | `{ x: number; y: number } \| undefined`                                                                 | Coordinates of the peel position, representing the corner currently peeling.                                                              |
+| `corner`        | `{ x: number; y: number } \| "TOP_LEFT" \| "TOP_RIGHT" \| "BOTTOM_LEFT" \| "BOTTOM_RIGHT" \| undefined` | Defines the corner from which the peel originates. Can be coordinate or corner name. Defaults to `"BOTTOM_RIGHT"`.                        |
+| `constraints`   | `{ x: number; y: number } \| string \| Array<{ x: number; y: number } \| string> \| undefined`          | List of constraints limiting how far the peel can extend, defined as coordinates or corner names.                                         |
+| `drag`          | `boolean \| undefined`                                                                                  | Enables peel dragging using mouse/touch to move the peel position dynamically.                                                            |
+| `mode`          | `"book" \| "calendar" \| undefined`                                                                     | Predefined peel modes with specific constraints. Supported: `"book"` and `"calendar"`.                                                    |
+| `fadeThreshold` | `number \| undefined`                                                                                   | Threshold (0 to 1) at which the top peel layer begins to fade out as it is peeled away.                                                   |
+| `timeAlongPath` | `number \| undefined`                                                                                   | Animates the peel along a predefined path at a given time (between 0 and 1). Throws error if no path is set.                              |
+| `peelPath`      | `number[] \| undefined`                                                                                 | Defines the path (line or bezier curve) along which the peel moves.                                                                       |
 
 ## Contribution
 
-Contributions are welcome! Feel free to check out the [Contributing Guide](https://github.com/iqbal-rashed/react-peel/blob/main/.github/contributing.md) before making a pull request.
+Contributions are very welcome! If you'd like to contribute, please review the [Contributing Guide](https://github.com/iqbal-rashed/react-peel/blob/main/.github/contributing.md) before submitting a pull request.
+
+---

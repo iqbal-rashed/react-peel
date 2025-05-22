@@ -11,7 +11,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: https://iqbal-rashed.github.io/react-peel/guide/getting-started
+      link: ../guide/getting-started
     - theme: alt
       text: View on GitHub
       link: https://github.com/iqbal-rashed/react-peel

@@ -4,13 +4,12 @@ import packageJson from "../../package.json";
 export default defineConfig({
   title: "React Peel",
   icon: "/peel.png",
-  base: "/react-peel/",
   themeConfig: {
     nav: [
       {
         text: "Guide",
-        link: "guide/getting-started",
-        activeMatch: "guide/",
+        link: "/guide/getting-started",
+        activeMatch: "/guide/",
       },
       {
         text: `v${packageJson.version}`,
@@ -34,21 +33,21 @@ export default defineConfig({
       },
     ],
     sidebar: {
-      "guide/": [
+      "/guide/": [
         {
           text: "Guide",
           items: [
             {
               text: "Getting Started",
-              link: "guide/getting-started",
+              link: "/guide/getting-started",
             },
             {
               text: "Examples",
-              link: "guide/examples",
+              link: "/guide/examples",
             },
             {
               text: "Api",
-              link: "guide/api",
+              link: "/guide/api",
             },
           ],
         },

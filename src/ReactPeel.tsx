@@ -1,45 +1,121 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useRef, useCallback } from "react";
 import PeelLib, { PeelCorners } from "./peel";
-import { HtmlDivProps, PeelOptions, Props, TCoords } from "./types";
+import { HtmlDivProps, PeelOptions, Props, TCoords, PeelRef } from "./types";
+import { getPreset } from "./presets";
 
 export const PeelWrapper = forwardRef(Peel);
 
 function Peel(
   { children, options = {}, containerProps, ...props }: Props,
-  refer: any
+  refer: React.Ref<PeelRef>
 ) {
   const ref = useRef<HTMLDivElement>(null);
-  const peelRef = useRef<any>(null);
+  const peelRef = useRef<PeelRef | null>(null);
+  const lastProgressRef = useRef<number>(0);
+  const isPeelingRef = useRef<boolean>(false);
 
   useInitializeCss();
+
+  // Merge preset options with provided options
+  const mergedOptions = React.useMemo(() => {
+    if (props.preset) {
+      const preset = getPreset(props.preset);
+      return { ...preset.options, ...options };
+    }
+    return options;
+  }, [props.preset, options]);
+
+  // Get preset corner and mode if not explicitly provided
+  const effectiveCorner = React.useMemo(() => {
+    if (props.corner) return props.corner;
+    if (props.preset) {
+      const preset = getPreset(props.preset);
+      return preset.corner;
+    }
+    return undefined;
+  }, [props.corner, props.preset]);
+
+  const effectiveMode = React.useMemo(() => {
+    if (props.mode) return props.mode;
+    if (props.preset) {
+      const preset = getPreset(props.preset);
+      return preset.mode;
+    }
+    return undefined;
+  }, [props.mode, props.preset]);
+
+  // Track peel progress for callbacks
+  const trackProgress = useCallback(() => {
+    if (!peelRef.current || !props.onPeelProgress) return;
+
+    const progress = peelRef.current.getAmountClipped();
+    if (progress !== lastProgressRef.current) {
+      props.onPeelProgress(progress, peelRef.current);
+      lastProgressRef.current = progress;
+    }
+  }, [props.onPeelProgress]);
+
+  // Handle peel start
+  const handlePeelStart = useCallback(() => {
+    if (!isPeelingRef.current && peelRef.current) {
+      isPeelingRef.current = true;
+      props.onPeelStart?.(peelRef.current);
+    }
+  }, [props.onPeelStart]);
+
+  // Handle peel end
+  const handlePeelEnd = useCallback(() => {
+    if (isPeelingRef.current && peelRef.current) {
+      const progress = peelRef.current.getAmountClipped();
+      // Consider peel ended if fully open or at constraint
+      if (progress >= 0.99 || progress <= 0.01) {
+        isPeelingRef.current = false;
+        props.onPeelEnd?.(peelRef.current);
+      }
+    }
+  }, [props.onPeelEnd]);
 
   useEffect(() => {
     function initialize() {
       if (!ref.current) return;
       const PeelJs = PeelLib();
-      const p = new PeelJs(ref.current, normalizeOptions(options));
+      const p = new PeelJs(ref.current, normalizeOptions(mergedOptions));
       peelRef.current = p;
 
       if (refer) {
-        refer.current = p;
+        if (typeof refer === "function") {
+          refer(p);
+        } else {
+          (refer as React.MutableRefObject<PeelRef>).current = p;
+        }
       }
 
-      if (props.peelPosition) {
+      if (props.peelPosition && peelRef.current) {
         peelRef.current.setPeelPosition(
           props.peelPosition.x,
           props.peelPosition.y
         );
       }
 
-      if (props.corner) {
+      if (effectiveCorner && peelRef.current) {
         if (
-          Object.prototype.hasOwnProperty.call(props.corner, "x") &&
-          Object.prototype.hasOwnProperty.call(props.corner, "y")
+          Object.prototype.hasOwnProperty.call(effectiveCorner, "x") &&
+          Object.prototype.hasOwnProperty.call(effectiveCorner, "y")
         ) {
-          const { x, y } = props.corner as TCoords;
+          const { x, y } = effectiveCorner as TCoords;
           peelRef.current.setCorner(x, y);
-        } else if (isPeelCorners(props.corner)) {
-          peelRef.current.setCorner(peelCornersValue(props.corner));
+        } else if (isPeelCorners(effectiveCorner)) {
+          peelRef.current.setCorner(peelCornersValue(effectiveCorner));
+        }
+      }
+
+      // Apply preset constraints
+      if (props.preset) {
+        const preset = getPreset(props.preset);
+        if (preset.constraints) {
+          preset.constraints.forEach((constraint) => {
+            peelRef.current?.addPeelConstraint(peelCornersValue(constraint));
+          });
         }
       }
 
@@ -53,36 +129,50 @@ function Peel(
         }
       }
 
-      if (props.mode) {
-        peelRef.current.setMode(props.mode);
+      if (effectiveMode && peelRef.current) {
+        peelRef.current.setMode(effectiveMode);
       }
 
-      if (props.fadeThreshold) {
+      if (props.fadeThreshold && peelRef.current) {
         peelRef.current.setFadeThreshold(props.fadeThreshold);
       }
 
-      if (props.peelPath && Array.isArray(props.peelPath)) {
+      if (props.peelPath && Array.isArray(props.peelPath) && peelRef.current) {
         peelRef.current.setPeelPath(...props.peelPath);
       }
 
-      if (props.drag) {
-        peelRef.current?.handleDrag(function (
-          _evt: MouseEvent,
-          x: number,
-          y: number
-        ) {
-          peelRef.current.setPeelPosition(x, y);
-        });
-      }
-      if (props.handleDrag) {
-        peelRef.current?.handleDrag((evt: MouseEvent, x: number, y: number) =>
-          props.handleDrag?.(evt, x, y, peelRef.current)
-        );
-      }
-      if (props.handlePress) {
-        peelRef.current?.handlePress((evt: MouseEvent) =>
-          props.handlePress?.(evt, peelRef.current)
-        );
+      // Setup drag handling (unless disabled)
+      if (!props.disabled) {
+        if (props.drag) {
+          peelRef.current?.handleDrag(function (
+            _evt: MouseEvent,
+            x: number,
+            y: number
+          ) {
+            if (props.disabled) return;
+            handlePeelStart();
+            peelRef.current?.setPeelPosition(x, y);
+            trackProgress();
+            handlePeelEnd();
+          });
+        }
+        if (props.handleDrag) {
+          peelRef.current?.handleDrag(
+            (evt: MouseEvent, x: number, y: number) => {
+              if (props.disabled) return;
+              handlePeelStart();
+              props.handleDrag?.(evt, x, y, peelRef.current as PeelRef);
+              trackProgress();
+              handlePeelEnd();
+            }
+          );
+        }
+        if (props.handlePress) {
+          peelRef.current?.handlePress((evt: MouseEvent) => {
+            if (props.disabled) return;
+            props.handlePress?.(evt, peelRef.current as PeelRef);
+          });
+        }
       }
     }
 
@@ -92,52 +182,54 @@ function Peel(
         peelRef.current.clear();
       }
     };
-  }, [options]);
+  }, [mergedOptions, props.disabled]);
 
   useEffect(() => {
     if (props.timeAlongPath) {
       peelRef.current?.setTimeAlongPath(props.timeAlongPath);
+      trackProgress();
     }
-  }, [props.timeAlongPath]);
+  }, [props.timeAlongPath, trackProgress]);
 
   useEffect(() => {
     if (props.peelPosition) {
-      peelRef.current.setPeelPosition(
+      peelRef.current?.setPeelPosition(
         props.peelPosition.x,
         props.peelPosition.y
       );
+      trackProgress();
     }
-  }, [props.peelPosition]);
+  }, [props.peelPosition, trackProgress]);
 
   useEffect(() => {
-    if (props.corner) {
+    if (effectiveCorner) {
       if (
-        Object.prototype.hasOwnProperty.call(props.corner, "x") &&
-        Object.prototype.hasOwnProperty.call(props.corner, "y")
+        Object.prototype.hasOwnProperty.call(effectiveCorner, "x") &&
+        Object.prototype.hasOwnProperty.call(effectiveCorner, "y")
       ) {
-        const { x, y } = props.corner as TCoords;
-        peelRef.current.setCorner(x, y);
-      } else if (isPeelCorners(props.corner)) {
-        peelRef.current.setCorner(peelCornersValue(props.corner));
+        const { x, y } = effectiveCorner as TCoords;
+        peelRef.current?.setCorner(x, y);
+      } else if (isPeelCorners(effectiveCorner)) {
+        peelRef.current?.setCorner(peelCornersValue(effectiveCorner));
       }
     }
-  }, [props.corner]);
+  }, [effectiveCorner]);
 
   useEffect(() => {
     if (props.peelPath && Array.isArray(props.peelPath)) {
-      peelRef.current.setPeelPath(...props.peelPath);
+      peelRef.current?.setPeelPath(...props.peelPath);
     }
   }, [props.peelPath]);
 
   useEffect(() => {
-    if (props.mode) {
-      peelRef.current.setMode(props.mode);
+    if (effectiveMode) {
+      peelRef.current?.setMode(effectiveMode);
     }
-  }, [props.mode]);
+  }, [effectiveMode]);
 
   useEffect(() => {
     if (props.fadeThreshold) {
-      peelRef.current.setFadeThreshold(props.fadeThreshold);
+      peelRef.current?.setFadeThreshold(props.fadeThreshold);
     }
   }, [props.fadeThreshold]);
 
@@ -155,56 +247,59 @@ function Peel(
 
   function addPeelConstraint(cons: Props["constraints"]) {
     if (isPeelCorners(cons)) {
-      peelRef.current.addPeelConstraint(peelCornersValue(cons));
+      peelRef.current?.addPeelConstraint(peelCornersValue(cons));
     } else if (
       Object.prototype.hasOwnProperty.call(cons, "x") &&
       Object.prototype.hasOwnProperty.call(cons, "y")
     ) {
       const t = cons as TCoords;
-      peelRef.current.addPeelConstraint(t.x, t.y);
+      peelRef.current?.addPeelConstraint(t.x, t.y);
     }
   }
 
   return (
     <div
       ref={ref}
-      className={"peel " + props?.className}
+      className={"peel " + (props?.className || "")}
       {...containerProps}
       style={{
         height: props.height || "100%",
         width: props.width || "100%",
+        pointerEvents: props.disabled ? "none" : undefined,
         ...containerProps?.style,
       }}
+      aria-disabled={props.disabled}
     >
       {children}
     </div>
   );
 }
 
-function normalizeOptions(options: PeelOptions) {
-  if (options.corner) {
-    options.corner = isPeelCorners(options.corner)
-      ? peelCornersValue(options.corner)
-      : undefined;
-  }
-
-  return options;
+function normalizeOptions(options: PeelOptions): PeelOptions {
+  const result = { ...options };
+  // Remove corner from options as it's handled separately
+  // This prevents type conflicts with the peel.js constructor
+  delete result.corner;
+  return result;
 }
 
-function isPeelCorners(value: any) {
-  return Object.keys(PeelCorners).includes(value);
+function isPeelCorners(value: unknown): value is keyof typeof PeelCorners {
+  return typeof value === "string" && Object.keys(PeelCorners).includes(value);
 }
 
-function peelCornersValue(value: any) {
-  const pValue = PeelCorners[value as keyof typeof PeelCorners];
-  return pValue as any;
+function peelCornersValue(value: keyof typeof PeelCorners) {
+  return PeelCorners[value];
 }
 
 PeelWrapper.displayName = "PeelWrapper";
 
 const useInitializeCss = () => {
   useEffect(() => {
+    // Check if styles are already added
+    if (document.getElementById("react-peel-styles")) return;
+
     const styleDoc = document.createElement("style");
+    styleDoc.id = "react-peel-styles";
     styleDoc.innerHTML = `
     .peel {
       position: relative;
@@ -244,36 +339,47 @@ const useInitializeCss = () => {
 
     document.head.appendChild(styleDoc);
     return () => {
-      document.head.removeChild(styleDoc);
+      const existingStyle = document.getElementById("react-peel-styles");
+      if (existingStyle) {
+        document.head.removeChild(existingStyle);
+      }
     };
   }, []);
 };
 
-export const PeelTop = forwardRef(function (
-  { className, ...props }: HtmlDivProps,
-  ref: React.Ref<HTMLDivElement>
+/**
+ * Top layer of the peel effect (the page being peeled)
+ */
+export const PeelTop = forwardRef<HTMLDivElement, HtmlDivProps>(function PeelTop(
+  { className = "", ...props },
+  ref
 ) {
   return <div ref={ref} className={"peel-top " + className} {...props}></div>;
 });
 
 PeelTop.displayName = "PeelTop";
 
-export const PeelBack = forwardRef(function (
-  { className, ...props }: HtmlDivProps,
-  ref: React.Ref<HTMLDivElement>
+/**
+ * Back layer of the peel effect (backside of the page)
+ */
+export const PeelBack = forwardRef<HTMLDivElement, HtmlDivProps>(function PeelBack(
+  { className = "", ...props },
+  ref
 ) {
   return <div ref={ref} className={"peel-back " + className} {...props}></div>;
 });
 
 PeelBack.displayName = "PeelBack";
 
-export const PeelBottom = forwardRef(function (
-  { className, ...props }: HtmlDivProps,
-  ref: React.Ref<HTMLDivElement>
-) {
-  return (
-    <div ref={ref} className={"peel-bottom " + className} {...props}></div>
-  );
-});
+/**
+ * Bottom layer of the peel effect (content revealed underneath)
+ */
+export const PeelBottom = forwardRef<HTMLDivElement, HtmlDivProps>(
+  function PeelBottom({ className = "", ...props }, ref) {
+    return (
+      <div ref={ref} className={"peel-bottom " + className} {...props}></div>
+    );
+  }
+);
 
 PeelBottom.displayName = "PeelBottom";

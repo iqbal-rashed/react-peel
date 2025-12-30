@@ -1,129 +1,278 @@
-# Api
+# API Reference
 
-## Props
+Complete API reference for React Peel components, hooks, and utilities.
 
-### `ref`
+## Components
 
-```typescript
-MutableRefObject<any> | undefined;
+### PeelWrapper
+
+The main container component that manages the peel effect.
+
+```tsx
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+<PeelWrapper height={200} width={200} drag>
+  <PeelTop />
+  <PeelBack />
+  <PeelBottom />
+</PeelWrapper>
 ```
 
-Reference to the Peel object, containing values and methods.
+#### Props
 
-### `className`
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `ref` | `RefObject<PeelRef>` | - | Reference to access peel instance methods |
+| `className` | `string` | - | CSS class for the container |
+| `height` | `string \| number` | `"100%"` | Height of the peel container |
+| `width` | `string \| number` | `"100%"` | Width of the peel container |
+| `preset` | `PresetName` | - | Apply a preset configuration |
+| `corner` | `CornerValue` | `"BOTTOM_RIGHT"` | Corner to peel from |
+| `peelPosition` | `{ x: number; y: number }` | - | Current peel position |
+| `constraints` | `ConstraintValue` | - | Constraints limiting peel distance |
+| `mode` | `"book" \| "calendar"` | - | Predefined constraint modes |
+| `drag` | `boolean` | `false` | Enable drag interaction |
+| `disabled` | `boolean` | `false` | Disable all interactions |
+| `fadeThreshold` | `number` | - | Threshold (0-1) to fade out top layer |
+| `peelPath` | `number[]` | - | Path for peel animation |
+| `timeAlongPath` | `number` | - | Position (0-1) along the path |
+| `options` | `PeelOptions` | - | Additional peel.js options |
+| `containerProps` | `HTMLDivAttributes` | - | Props for container div |
 
-```typescript
-string | undefined;
+#### Event Callbacks
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `handleDrag` | `(event, x, y, peel) => void` | Called during drag |
+| `handlePress` | `(event, peel) => void` | Called on click/tap |
+| `onPeelStart` | `(peel) => void` | Called when peeling starts |
+| `onPeelEnd` | `(peel) => void` | Called when peeling ends |
+| `onPeelProgress` | `(progress, peel) => void` | Called with progress (0-1) |
+
+### PeelTop, PeelBack, PeelBottom
+
+Layer components that define the peel content.
+
+```tsx
+<PeelTop style={{ backgroundColor: "#81afcb" }}>
+  Content on top
+</PeelTop>
 ```
 
-Represents the class of PeelWrapper.
+All three components accept standard HTML div props.
 
-### `height`
+---
 
-```typescript
-string | undefined;
+## Hooks
+
+### usePeel
+
+Hook for programmatic control of peel effects.
+
+```tsx
+import { usePeel } from "react-peel";
+
+const { peelRef, animate, reset, setPosition, getProgress, stop, isAnimating } = usePeel();
 ```
 
-Sets the height of PeelWrapper. Default is `100%`.
+#### Returns
 
-### `width`
+| Property | Type | Description |
+|----------|------|-------------|
+| `peelRef` | `MutableRefObject<any>` | Attach to PeelWrapper ref |
+| `animate` | `(options) => Promise<void>` | Animate peel to position |
+| `reset` | `() => void` | Reset to corner position |
+| `setPosition` | `(x, y) => void` | Set position immediately |
+| `getProgress` | `() => number` | Get clipped area ratio |
+| `stop` | `() => void` | Stop current animation |
+| `isAnimating` | `() => boolean` | Check if animating |
 
-```typescript
-string | undefined;
+#### Animate Options
+
+```tsx
+await animate({
+  to: { x: 100, y: 100 },        // Required: target position
+  from: { x: 200, y: 200 },      // Optional: start position
+  duration: 500,                  // Optional: duration in ms
+  easing: "easeOut",             // Optional: easing function
+  onStart: () => {},             // Optional: start callback
+  onEnd: () => {},               // Optional: end callback
+  onProgress: (progress) => {},  // Optional: progress callback
+});
 ```
 
-Sets the height of PeelWrapper. Default is `100%`.
+---
 
-### `options`
+## Presets
 
-The options to pass to the underlying peel.js constructor as listed [here](https://andrewplummer.github.io/peel-js/#options).
+Pre-configured effects for common use cases.
 
-### `options.shape`
+```tsx
+import { presets, getPreset } from "react-peel";
 
-```typescript
-SvgElementProps | undefined;
+// Use with PeelWrapper
+<PeelWrapper preset="stickyNote" />
+
+// Get preset configuration
+const preset = getPreset("stickyNote");
 ```
 
-Any SVG element can be specified here which will create a subclip for the effect and allow custom shapes to be used. <a href="examples#circle">See the examples for more</a>
+### Available Presets
 
-### `peelPosition`
+| Name | Description |
+|------|-------------|
+| `stickyNote` | Small corner curl for sticky notes |
+| `pageFlip` | Book-like page turn with spine constraint |
+| `revealCard` | Scratch-off style reveal |
+| `calendar` | Top-edge constrained calendar flip |
+| `envelope` | Envelope flap opening |
+| `giftCard` | Dramatic reveal with reflection |
+| `photoAlbum` | Smooth page turn for photos |
+| `scratchCard` | Lottery ticket scratch-off |
 
-```typescript
-{ x: number, y: number } | undefined
+---
+
+## Animations
+
+Animation utilities for custom effects.
+
+### easings
+
+Built-in easing functions.
+
+```tsx
+import { easings } from "react-peel";
+
+// Available: linear, easeIn, easeOut, easeInOut, 
+//           easeInQuad, easeOutQuad, easeInOutQuad,
+//           easeInExpo, easeOutExpo, spring, bounce, backOut
+const value = easings.easeOut(0.5); // 0.75
 ```
 
-The position of the peel effect. This point is the position of the corner that is being peeled back.
+### animate
 
-### `corner`
+Low-level animation helper.
 
-```typescript
-{ x: number, y: number } | "TOP_LEFT" | "TOP_RIGHT" | "BOTTOM_LEFT" | "BOTTOM_RIGHT" | undefined
+```tsx
+import { animate } from "react-peel";
+
+const { stop, finished } = animate({
+  from: 0,
+  to: 100,
+  duration: 500,
+  easing: "easeOut",
+  onUpdate: (value) => console.log(value),
+  onComplete: () => console.log("Done!"),
+});
+
+await finished;
 ```
 
-The corner for the effect to peel back from. Can be 2 arguments as x,y coordinates or a single argument as a corner name. Default is the bottom right corner.
+### animatePeelPosition
 
-### `constraints`
+Animate peel instance position.
 
-```typescript
-{ x: number, y: number } | | "TOP_LEFT" | "TOP_RIGHT" | "BOTTOM_LEFT" | "BOTTOM_RIGHT" | undefined | Array<{ x: number, y: number } | | "TOP_LEFT" | "TOP_RIGHT" | "BOTTOM_LEFT" | "BOTTOM_RIGHT" | undefined>
+```tsx
+import { animatePeelPosition } from "react-peel";
+
+const controller = animatePeelPosition({
+  peel: peelRef.current,
+  from: { x: 200, y: 200 },
+  to: { x: 50, y: 50 },
+  duration: 600,
+  easing: "easeInOut",
+});
 ```
 
-List of constraints on the distance of the peel. This can be thought of as points on the layers that are connected and cannot be torn apart. Typically this only makes sense as a point on the outer edge, such as the left edge of an open book, or the top edge of a calendar. In this case, simply using 2 constraint points (top-left/bottom-left for a book, etc) will create the desired effect. An arbitrary point can also be used with an effect like a thumbtack holding the pages together. Can be 2 arguments as x,y coordinates or a single argument as a corner name.
+### loopPeel
 
-### `drag`
+Create looping peel animation.
 
-```typescript
-boolean | undefined;
+```tsx
+import { loopPeel } from "react-peel";
+
+const stop = loopPeel({
+  peel: peelRef.current,
+  path: [200, 200, -200, -200],
+  duration: 1000,
+  pingPong: true,
+});
+
+// Later: stop the loop
+stop();
 ```
 
-A shorthand for setting the `@drag` event to set the peel position to the mouse.
+### peelHint
 
-### `mode`
+Draw attention to peel corner.
 
-```typescript
-"book" | "calendar" | undefined;
+```tsx
+import { peelHint } from "react-peel";
+
+await peelHint(peelRef.current, {
+  peekSize: 30,
+  duration: 300,
+  repeat: 2,
+});
 ```
 
-A shortcut for setting predefined `constraints`. Currently `"book"` and `"calendar"`.
+---
 
-### `fadeThreshold`
+## Types
 
-```typescript
-number | undefined;
+All types are exported for TypeScript users:
+
+```tsx
+import type {
+  PeelWrapperProps,
+  PeelLayerProps,
+  PeelRef,
+  PeelOptions,
+  TCoords,
+  CornerName,
+  CornerValue,
+  ConstraintValue,
+  PresetName,
+  PeelPreset,
+  EasingName,
+  EasingFunction,
+  AnimationController,
+} from "react-peel";
 ```
 
-A threshold above which the top layer (including the backside) layer will begin to fade out. The threshold is between 0 (no peel) and 1 (top layer is fully peeled off) and is calculated based on the visible clipped area. If a peel path is set, it will use the progress along the path instead.
+---
 
-### `timeAlongPath`
+## Corner Values
 
-```typescript
-number | undefined;
+Corners can be specified as names or coordinates:
+
+```tsx
+// By name
+corner="BOTTOM_RIGHT"
+corner="TOP_LEFT"
+corner="TOP_RIGHT"
+corner="BOTTOM_LEFT"
+
+// By coordinates
+corner={{ x: 200, y: 200 }}
 ```
 
-Sets the peel effect to a point in time (between 0 and 1) along a previously specified path. Will throw an error if no path exists.
+---
 
-### `peelPath`
+## PeelOptions
 
-```typescript
-number[] | undefined
-```
+Options passed to the underlying peel.js instance:
 
-A path along which the peel will follow. This can be a flat line segment (represented by 4 arguments: x1, y1, x2, y2) or a bezier curve (represented by 8 arguments: x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2 where cp1 and cp2 are the 2 bezier control points, similar to the [bezierCurveTo](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Drawing_shapes#Cubic_Bezier_curves) canvas method.)
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `topShadow` | `boolean` | `true` | Enable top layer shadow |
+| `topShadowBlur` | `number` | `5` | Shadow blur radius |
+| `topShadowAlpha` | `number` | `0.5` | Shadow opacity |
+| `backReflection` | `boolean` | `false` | Enable back reflection |
+| `backReflectionAlpha` | `number` | `0.15` | Reflection opacity |
+| `backShadow` | `boolean` | `true` | Enable back shadow |
+| `backShadowSize` | `number` | `0.04` | Shadow size |
+| `bottomShadow` | `boolean` | `true` | Enable bottom shadow |
+| `shape` | `SvgElementProps` | - | Custom SVG shape |
 
-## Events
-
-### `handleDrag`
-
-```typescript
-(event: MouseEvent, x: number, y: number, peel: any) => any | undefined;
-```
-
-Sets a function to be called when the user drags, either with a mouse or with a finger (using touch events).
-
-### `handlePress`
-
-```typescript
-(event: MouseEvent, peel: any) => any | undefined;
-```
-
-Sets a function to be called when the user either clicks with a mouse or taps with a finger.
+See the [original peel.js documentation](https://andrewplummer.github.io/peel-js/#options) for complete options.

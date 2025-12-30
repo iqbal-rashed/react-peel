@@ -1,31 +1,162 @@
-import { PeelBack, PeelBottom, PeelWrapper, PeelTop } from "../../src/index";
-
 # Getting Started
 
-Currently supported by all browsers that support CSS clip paths and transforms (generally most evergreen browsers including mobile, but excluding IE). No dependencies.
+Welcome to React Peel! This guide will help you get started with creating beautiful peel effects in your React applications.
 
 ## Installation
 
-```sh
-npm install react-peel
+Install react-peel using your preferred package manager:
+
+import { Tabs, Tab } from 'rspress/theme';
+
+<Tabs>
+  <Tab label="npm">
+    ```bash
+    npm install react-peel
+    ```
+  </Tab>
+  <Tab label="pnpm">
+    ```bash
+    pnpm add react-peel
+    ```
+  </Tab>
+  <Tab label="yarn">
+    ```bash
+    yarn add react-peel
+    ```
+  </Tab>
+  <Tab label="bun">
+    ```bash
+    bun add react-peel
+    ```
+  </Tab>
+</Tabs>
+
+## Quick Start
+
+The simplest way to create a peel effect:
+
+```tsx
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+function MyComponent() {
+  return (
+    <PeelWrapper height={200} width={200} drag>
+      <PeelTop style={{ backgroundColor: "#81afcb" }} />
+      <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+      <PeelBottom style={{ backgroundColor: "#688394" }} />
+    </PeelWrapper>
+  );
+}
 ```
 
-## Basic Usage
+This creates a 200x200 pixel element with three layers:
+- **PeelTop**: The top layer that gets peeled back
+- **PeelBack**: The back side of the peeled layer
+- **PeelBottom**: The content revealed underneath
 
-<div style={{ padding: "20px" }}>
-  <PeelWrapper height={200} width={200} drag>
-    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
-    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
-    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
-  </PeelWrapper>
-</div>
+The `drag` prop enables mouse/touch interaction.
 
-```jsx
-<div style={{ padding: "20px" }}>
-  <PeelWrapper height={200} width={200} drag>
-    <PeelTop style={{ backgroundColor: "#81afcb" }}></PeelTop>
-    <PeelBack style={{ backgroundColor: "#a0c7df" }}></PeelBack>
-    <PeelBottom style={{ backgroundColor: "#688394" }}></PeelBottom>
-  </PeelWrapper>
-</div>
+## Using Presets
+
+React Peel comes with pre-built presets for common use cases:
+
+```tsx
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+// Sticky note effect
+function StickyNote() {
+  return (
+    <PeelWrapper height={200} width={200} preset="stickyNote" drag>
+      <PeelTop style={{ backgroundColor: "#fff9c4" }}>
+        <p>Note content</p>
+      </PeelTop>
+      <PeelBack style={{ backgroundColor: "#fff59d" }} />
+      <PeelBottom style={{ backgroundColor: "#f5f5f5" }}>
+        <p>Hidden message!</p>
+      </PeelBottom>
+    </PeelWrapper>
+  );
+}
 ```
+
+Available presets: `stickyNote`, `pageFlip`, `revealCard`, `calendar`, `envelope`, `giftCard`, `photoAlbum`, `scratchCard`
+
+## Using the usePeel Hook
+
+For programmatic control over peel animations:
+
+```tsx
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
+
+function RevealButton() {
+  const { peelRef, animate, reset } = usePeel();
+
+  const handleReveal = async () => {
+    await animate({
+      to: { x: -100, y: -100 },
+      duration: 800,
+      easing: "easeOut",
+    });
+  };
+
+  return (
+    <>
+      <button onClick={handleReveal}>Reveal</button>
+      <button onClick={reset}>Reset</button>
+      
+      <PeelWrapper ref={peelRef} height={200} width={200}>
+        <PeelTop style={{ backgroundColor: "#e3f2fd" }} />
+        <PeelBack style={{ backgroundColor: "#bbdefb" }} />
+        <PeelBottom style={{ backgroundColor: "#90caf9" }}>
+          <p>🎉 Surprise!</p>
+        </PeelBottom>
+      </PeelWrapper>
+    </>
+  );
+}
+```
+
+## TypeScript Support
+
+React Peel is fully typed. Import types as needed:
+
+```tsx
+import type { 
+  PeelWrapperProps, 
+  PeelRef, 
+  PresetName,
+  PeelOptions 
+} from "react-peel";
+```
+
+## Framework Integration
+
+### Next.js
+
+React Peel works out of the box with Next.js. Since it uses DOM APIs, ensure components are client-side rendered:
+
+```tsx
+"use client";
+
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+export default function PeelComponent() {
+  return (
+    <PeelWrapper height={200} width={200} drag>
+      <PeelTop />
+      <PeelBack />
+      <PeelBottom />
+    </PeelWrapper>
+  );
+}
+```
+
+### Vite / Create React App
+
+No special configuration needed. Just install and import!
+
+## Next Steps
+
+- [API Reference](/guide/api) - Complete API documentation
+- [Examples](/guide/examples) - Interactive examples with code
+- [Real-World Examples](/examples/sticky-note) - Production-ready implementations

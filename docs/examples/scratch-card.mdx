@@ -1,0 +1,239 @@
+# Scratch Card
+
+A lottery-style scratch card with progressive reveal. Perfect for gamification, promotions, or interactive reveals.
+
+## Preview
+
+A scratch-off card that reveals a prize or message as the user peels back the cover.
+
+## Implementation
+
+```tsx
+import React, { useState, useCallback } from "react";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
+
+interface ScratchCardProps {
+  prize: string;
+  coverText?: string;
+  width?: number;
+  height?: number;
+  onReveal?: (prize: string) => void;
+  revealThreshold?: number;
+}
+
+export function ScratchCard({
+  prize,
+  coverText = "Scratch to reveal!",
+  width = 280,
+  height = 140,
+  onReveal,
+  revealThreshold = 0.6,
+}: ScratchCardProps) {
+  const { peelRef } = usePeel();
+  const [progress, setProgress] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+
+  const handleProgress = useCallback(
+    (newProgress: number) => {
+      setProgress(newProgress);
+      if (newProgress >= revealThreshold && !revealed) {
+        setRevealed(true);
+        onReveal?.(prize);
+      }
+    },
+    [revealed, revealThreshold, prize, onReveal]
+  );
+
+  return (
+    <div style={{ position: "relative" }}>
+      <PeelWrapper
+        ref={peelRef}
+        preset="scratchCard"
+        width={width}
+        height={height}
+        drag
+        fadeThreshold={0.85}
+        onPeelProgress={handleProgress}
+      >
+        <PeelTop
+          style={{
+            background: "linear-gradient(135deg, #9e9e9e 0%, #757575 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#fff",
+            fontSize: "18px",
+            fontWeight: "bold",
+            textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+          }}
+        >
+          <span style={{ opacity: revealed ? 0 : 1, transition: "opacity 0.3s" }}>
+            {coverText}
+          </span>
+        </PeelTop>
+        <PeelBack
+          style={{
+            background: "linear-gradient(135deg, #bdbdbd 0%, #9e9e9e 100%)",
+          }}
+        />
+        <PeelBottom
+          style={{
+            background: revealed
+              ? "linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)"
+              : "linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#fff",
+            transition: "background 0.3s",
+          }}
+        >
+          <div
+            style={{
+              fontSize: revealed ? "28px" : "20px",
+              fontWeight: "bold",
+              transition: "font-size 0.3s",
+              textAlign: "center",
+            }}
+          >
+            {prize}
+          </div>
+          {revealed && (
+            <div style={{ marginTop: "8px", fontSize: "14px", opacity: 0.9 }}>
+              🎉 Congratulations! 🎉
+            </div>
+          )}
+        </PeelBottom>
+      </PeelWrapper>
+
+      {/* Progress indicator */}
+      <div
+        style={{
+          marginTop: "12px",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          fontSize: "14px",
+          color: "#666",
+        }}
+      >
+        <div
+          style={{
+            flex: 1,
+            height: "4px",
+            backgroundColor: "#e0e0e0",
+            borderRadius: "2px",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: `${progress * 100}%`,
+              height: "100%",
+              backgroundColor: revealed ? "#4caf50" : "#2196f3",
+              transition: "width 0.1s, background-color 0.3s",
+            }}
+          />
+        </div>
+        <span>{Math.round(progress * 100)}%</span>
+      </div>
+    </div>
+  );
+}
+```
+
+## Usage Examples
+
+### Basic Scratch Card
+
+```tsx
+<ScratchCard 
+  prize="$50 OFF!" 
+  onReveal={(prize) => console.log("Revealed:", prize)} 
+/>
+```
+
+### Lottery Game
+
+```tsx
+function LotteryGame() {
+  const [results, setResults] = useState<string[]>([]);
+  
+  const prizes = [
+    { prize: "🎁 FREE SHIPPING", probability: 0.4 },
+    { prize: "💰 10% OFF", probability: 0.3 },
+    { prize: "🌟 25% OFF", probability: 0.2 },
+    { prize: "🏆 50% OFF!", probability: 0.1 },
+  ];
+
+  const getRandomPrize = () => {
+    const rand = Math.random();
+    let cumulative = 0;
+    for (const p of prizes) {
+      cumulative += p.probability;
+      if (rand < cumulative) return p.prize;
+    }
+    return prizes[0].prize;
+  };
+
+  const [cards] = useState(() => 
+    Array(3).fill(null).map(() => getRandomPrize())
+  );
+
+  return (
+    <div>
+      <h2>Scratch All Cards to Reveal Your Prizes!</h2>
+      <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
+        {cards.map((prize, i) => (
+          <ScratchCard
+            key={i}
+            prize={prize}
+            coverText={`Card ${i + 1}`}
+            onReveal={(p) => setResults((r) => [...r, p])}
+          />
+        ))}
+      </div>
+      {results.length === 3 && (
+        <div style={{ marginTop: "20px", padding: "16px", background: "#e8f5e9" }}>
+          <h3>Your Prizes:</h3>
+          <ul>
+            {results.map((r, i) => (
+              <li key={i}>{r}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+### Coupon Code Reveal
+
+```tsx
+function CouponReveal() {
+  const [code, setCode] = useState<string | null>(null);
+
+  return (
+    <div style={{ textAlign: "center" }}>
+      <h3>Scratch to reveal your exclusive discount code!</h3>
+      <ScratchCard
+        prize="SAVE25NOW"
+        coverText="Your discount awaits..."
+        width={320}
+        height={160}
+        onReveal={(prize) => setCode(prize)}
+      />
+      {code && (
+        <button
+          onClick={() => navigator.clipboard.writeText(code)}
+          style={{ marginTop: "16px", padding: "12px 24px" }}
+        >
+          📋 Copy Code: {code}
+        </button>
+      )}
+    </div>
+  );
+}
+```

@@ -1,13 +1,13 @@
 {
   "name": "react-peel",
-  "description": "react-peel is a react library to create realistic peeling effects. No dependencies.",
-  "version": "2.0.0",
+  "description": "A React library to create realistic peeling effects with hooks, presets, and animations. Zero external dependencies.",
+  "version": "2.1.0",
   "scripts": {
     "build": "tsup",
     "lint": "eslint . --max-warnings 0",
-    "dev:docs": "island dev docs",
-    "build:docs": "island build docs",
-    "preview:docs": "island start docs",
+    "dev:docs": "rspress dev",
+    "build:docs": "rspress build",
+    "preview:docs": "rspress preview",
     "prepare": "husky"
   },
   "files": [
@@ -41,7 +41,12 @@
     "animation library",
     "interactive UI",
     "react-component",
-    "ui-animation"
+    "ui-animation",
+    "page flip",
+    "book effect",
+    "scratch card",
+    "reveal animation",
+    "react hooks"
   ],
   "bugs": {
     "url": "https://github.com/iqbal-rashed/react-peel/issues"
@@ -59,9 +64,12 @@
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.1.0",
     "husky": "^9.1.7",
-    "islandjs": "^0.7.31",
+    "rspress": "^1.40.2",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.32.0"
-  }
+  },
+  "sideEffects": false,
+  "author": "Iqbal Rashed",
+  "license": "MIT"
 }

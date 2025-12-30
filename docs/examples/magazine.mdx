@@ -1,0 +1,238 @@
+# Magazine
+
+A multi-page magazine viewer with realistic page flip. Perfect for digital publications, lookbooks, or catalogs.
+
+## Preview
+
+A magazine that users can flip through with smooth page-turning animations.
+
+## Implementation
+
+```tsx
+import React, { useState } from "react";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
+
+interface MagazinePage {
+  content: React.ReactNode;
+  background?: string;
+}
+
+interface MagazineProps {
+  pages: MagazinePage[];
+  width?: number;
+  height?: number;
+  title?: string;
+}
+
+export function Magazine({
+  pages,
+  width = 300,
+  height = 420,
+  title = "Magazine",
+}: MagazineProps) {
+  const [currentPage, setCurrentPage] = useState(0);
+  const { peelRef, animate, reset } = usePeel();
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const goToNext = async () => {
+    if (currentPage >= pages.length - 1 || isAnimating) return;
+    setIsAnimating(true);
+
+    await animate({
+      to: { x: -width * 0.6, y: height * 0.5 },
+      duration: 500,
+      easing: "easeInOut",
+    });
+
+    setCurrentPage((p) => p + 1);
+    reset();
+    setIsAnimating(false);
+  };
+
+  const goToPrev = () => {
+    if (currentPage <= 0 || isAnimating) return;
+    setCurrentPage((p) => p - 1);
+    reset();
+  };
+
+  const currentContent = pages[currentPage];
+  const nextContent = pages[currentPage + 1];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      {/* Magazine spread */}
+      <div
+        style={{
+          display: "flex",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+          borderRadius: "4px",
+          overflow: "hidden",
+        }}
+      >
+        {/* Left page (previous content) */}
+        <div
+          style={{
+            width,
+            height,
+            background: currentPage > 0 ? pages[currentPage - 1]?.background || "#fff" : "#f0f0f0",
+            borderRight: "2px solid #ddd",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {currentPage > 0 ? (
+            pages[currentPage - 1]?.content
+          ) : (
+            <div style={{ color: "#999", textAlign: "center" }}>
+              <div style={{ fontSize: "24px", marginBottom: "8px" }}>📖</div>
+              <div>{title}</div>
+            </div>
+          )}
+        </div>
+
+        {/* Right page with peel effect */}
+        <PeelWrapper
+          ref={peelRef}
+          preset="pageFlip"
+          width={width}
+          height={height}
+          drag={currentPage < pages.length - 1}
+          disabled={isAnimating}
+          onPeelProgress={(progress) => {
+            if (progress > 0.6 && currentPage < pages.length - 1 && !isAnimating) {
+              setIsAnimating(true);
+              setCurrentPage((p) => p + 1);
+              reset();
+              setTimeout(() => setIsAnimating(false), 100);
+            }
+          }}
+        >
+          <PeelTop
+            style={{
+              background: currentContent?.background || "#fff",
+              padding: "24px",
+              overflow: "hidden",
+            }}
+          >
+            {currentContent?.content}
+          </PeelTop>
+          <PeelBack
+            style={{
+              background: currentContent?.background || "#fff",
+              filter: "brightness(0.95)",
+            }}
+          />
+          <PeelBottom
+            style={{
+              background: nextContent?.background || "#f5f5f5",
+              padding: "24px",
+            }}
+          >
+            {nextContent?.content || (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100%",
+                  color: "#666",
+                }}
+              >
+                The End
+              </div>
+            )}
+          </PeelBottom>
+        </PeelWrapper>
+      </div>
+
+      {/* Navigation */}
+      <div
+        style={{
+          marginTop: "20px",
+          display: "flex",
+          alignItems: "center",
+          gap: "20px",
+        }}
+      >
+        <button
+          onClick={goToPrev}
+          disabled={currentPage === 0 || isAnimating}
+          style={{
+            padding: "10px 20px",
+            cursor: currentPage === 0 ? "not-allowed" : "pointer",
+            opacity: currentPage === 0 ? 0.5 : 1,
+          }}
+        >
+          ← Previous
+        </button>
+        
+        {/* Page indicators */}
+        <div style={{ display: "flex", gap: "8px" }}>
+          {pages.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                background: i === currentPage ? "#333" : "#ccc",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                if (!isAnimating) setCurrentPage(i);
+              }}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={goToNext}
+          disabled={currentPage >= pages.length - 1 || isAnimating}
+          style={{
+            padding: "10px 20px",
+            cursor: currentPage >= pages.length - 1 ? "not-allowed" : "pointer",
+            opacity: currentPage >= pages.length - 1 ? 0.5 : 1,
+          }}
+        >
+          Next →
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+## Usage
+
+```tsx
+const magazinePages = [
+  {
+    content: (
+      <div style={{ textAlign: "center" }}>
+        <h1>Welcome to Our Magazine</h1>
+        <p>Issue #42 • December 2024</p>
+      </div>
+    ),
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  },
+  {
+    content: (
+      <article>
+        <h2>Feature Article</h2>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
+      </article>
+    ),
+  },
+  {
+    content: (
+      <div>
+        <img src="/magazine/spread-1.jpg" style={{ width: "100%" }} />
+        <p>Photo gallery continues...</p>
+      </div>
+    ),
+  },
+];
+
+<Magazine pages={magazinePages} title="Tech Weekly" />
+```

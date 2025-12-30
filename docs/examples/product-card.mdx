@@ -1,0 +1,247 @@
+# Product Card
+
+An e-commerce product card with a hidden discount reveal. Perfect for promotions, flash sales, or exclusive offers.
+
+## Preview
+
+A product card where users can peel back a corner to reveal a hidden discount code.
+
+## Implementation
+
+```tsx
+import React, { useState } from "react";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel, peelHint } from "react-peel";
+
+interface Product {
+  name: string;
+  price: number;
+  image: string;
+  discount?: {
+    code: string;
+    percentage: number;
+  };
+}
+
+interface ProductCardProps {
+  product: Product;
+  onDiscountReveal?: (code: string) => void;
+}
+
+export function ProductCard({ product, onDiscountReveal }: ProductCardProps) {
+  const { peelRef } = usePeel();
+  const [revealed, setRevealed] = useState(false);
+
+  React.useEffect(() => {
+    if (product.discount && peelRef.current) {
+      const timer = setTimeout(() => {
+        peelHint(peelRef.current, { peekSize: 20, duration: 250, repeat: 2 });
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [product.discount]);
+
+  const handleReveal = () => {
+    if (!revealed && product.discount) {
+      setRevealed(true);
+      onDiscountReveal?.(product.discount.code);
+    }
+  };
+
+  const discountedPrice = product.discount
+    ? product.price * (1 - product.discount.percentage / 100)
+    : product.price;
+
+  return (
+    <div
+      style={{
+        width: 280,
+        borderRadius: "12px",
+        overflow: "hidden",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        backgroundColor: "#fff",
+      }}
+    >
+      {/* Product Image with Peel */}
+      <PeelWrapper
+        ref={peelRef}
+        preset="revealCard"
+        width={280}
+        height={200}
+        drag={!!product.discount}
+        disabled={!product.discount}
+        onPeelProgress={(progress) => {
+          if (progress > 0.5) handleReveal();
+        }}
+      >
+        <PeelTop>
+          <img
+            src={product.image}
+            alt={product.name}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+          {product.discount && !revealed && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: 8,
+                right: 8,
+                background: "#ff5722",
+                color: "#fff",
+                padding: "4px 8px",
+                borderRadius: "4px",
+                fontSize: "12px",
+                fontWeight: "bold",
+              }}
+            >
+              🎁 Peel for discount!
+            </div>
+          )}
+        </PeelTop>
+        <PeelBack
+          style={{
+            background: "linear-gradient(135deg, #ff9800 0%, #ff5722 100%)",
+          }}
+        />
+        <PeelBottom
+          style={{
+            background: "linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#fff",
+          }}
+        >
+          <div style={{ fontSize: "14px", marginBottom: "4px" }}>
+            YOUR DISCOUNT CODE
+          </div>
+          <div
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              letterSpacing: "2px",
+            }}
+          >
+            {product.discount?.code}
+          </div>
+          <div style={{ fontSize: "16px", marginTop: "4px" }}>
+            {product.discount?.percentage}% OFF
+          </div>
+        </PeelBottom>
+      </PeelWrapper>
+
+      {/* Product Info */}
+      <div style={{ padding: "16px" }}>
+        <h3 style={{ margin: "0 0 8px", fontSize: "18px" }}>{product.name}</h3>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {revealed ? (
+            <>
+              <span
+                style={{
+                  textDecoration: "line-through",
+                  color: "#999",
+                  fontSize: "14px",
+                }}
+              >
+                ${product.price.toFixed(2)}
+              </span>
+              <span
+                style={{
+                  color: "#4caf50",
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                }}
+              >
+                ${discountedPrice.toFixed(2)}
+              </span>
+            </>
+          ) : (
+            <span style={{ fontSize: "20px", fontWeight: "bold" }}>
+              ${product.price.toFixed(2)}
+            </span>
+          )}
+        </div>
+        <button
+          style={{
+            width: "100%",
+            marginTop: "12px",
+            padding: "12px",
+            backgroundColor: revealed ? "#4caf50" : "#2196f3",
+            color: "#fff",
+            border: "none",
+            borderRadius: "8px",
+            fontSize: "16px",
+            fontWeight: "bold",
+            cursor: "pointer",
+          }}
+        >
+          {revealed ? "Add with Discount!" : "Add to Cart"}
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+## Usage
+
+```tsx
+<ProductCard
+  product={{
+    name: "Premium Headphones",
+    price: 199.99,
+    image: "/products/headphones.jpg",
+    discount: {
+      code: "SAVE30",
+      percentage: 30,
+    },
+  }}
+  onDiscountReveal={(code) => {
+    console.log("Discount revealed:", code);
+    // Track analytics, apply discount, etc.
+  }}
+/>
+```
+
+## Product Grid
+
+```tsx
+function ProductGrid() {
+  const products = [
+    {
+      name: "Wireless Earbuds",
+      price: 79.99,
+      image: "/products/earbuds.jpg",
+      discount: { code: "AUDIO20", percentage: 20 },
+    },
+    {
+      name: "Smart Watch",
+      price: 299.99,
+      image: "/products/watch.jpg",
+      discount: { code: "TECH15", percentage: 15 },
+    },
+    {
+      name: "Laptop Stand",
+      price: 49.99,
+      image: "/products/stand.jpg",
+      // No discount
+    },
+  ];
+
+  return (
+    <div style={{ 
+      display: "grid", 
+      gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", 
+      gap: "24px" 
+    }}>
+      {products.map((product, i) => (
+        <ProductCard key={i} product={product} />
+      ))}
+    </div>
+  );
+}
+```

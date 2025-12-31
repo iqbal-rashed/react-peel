@@ -1,0 +1,15 @@
+# React Peel Documentation - robots.txt
+# https://iqbal-rashed.github.io/react-peel
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://iqbal-rashed.github.io/react-peel/sitemap.xml
+
+# Disallow admin/private areas (if any)
+Disallow: /private/
+Disallow: /*.json$
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1

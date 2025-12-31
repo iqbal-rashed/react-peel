@@ -1,10 +1,22 @@
 # Photo Album
 
-A book-style photo album with realistic page flip animations. Perfect for portfolios, galleries, or lookbooks.
+Use the `photoAlbum` preset to build a page-flip gallery.
 
-## Preview
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
-A book that users can flip through using drag gestures or navigation buttons.
+## Live Demo
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper preset="photoAlbum" width={240} height={320} drag>
+    <PeelTop style={{ background: "#cfd8dc", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      Current Photo
+    </PeelTop>
+    <PeelBack style={{ background: "#b0bec5" }} />
+    <PeelBottom style={{ background: "#eceff1", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      Next Photo
+    </PeelBottom>
+  </PeelWrapper>
+</div>
 
 ## Implementation
 
@@ -12,144 +24,41 @@ A book that users can flip through using drag gestures or navigation buttons.
 import React, { useState } from "react";
 import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
 
-interface Photo {
-  src: string;
-  caption?: string;
-}
-
 interface PhotoAlbumProps {
-  photos: Photo[];
-  width?: number;
-  height?: number;
+  photos: string[];
 }
 
-export function PhotoAlbum({ photos, width = 300, height = 400 }: PhotoAlbumProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const { peelRef, animate, reset } = usePeel();
+export function PhotoAlbum({ photos }: PhotoAlbumProps) {
+  const [index, setIndex] = useState(0);
+  const { peelRef, reset } = usePeel();
 
-  const nextPhoto = async () => {
-    if (currentIndex >= photos.length - 1) return;
-
-    await animate({
-      to: { x: -width * 0.5, y: height * 0.5 },
-      duration: 600,
-      easing: "easeInOut",
-    });
-
-    setCurrentIndex((i) => i + 1);
-    reset();
-  };
-
-  const prevPhoto = () => {
-    if (currentIndex <= 0) return;
-    setCurrentIndex((i) => i - 1);
-    reset();
-  };
-
-  const currentPhoto = photos[currentIndex];
-  const nextPhotoData = photos[currentIndex + 1];
+  const current = photos[index];
+  const next = photos[index + 1];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <PeelWrapper
-        ref={peelRef}
-        preset="photoAlbum"
-        width={width}
-        height={height}
-        drag
-        onPeelProgress={(progress) => {
-          if (progress > 0.8 && currentIndex < photos.length - 1) {
-            setCurrentIndex((i) => i + 1);
-            reset();
-          }
+    <PeelWrapper
+      ref={peelRef}
+      preset="photoAlbum"
+      width={260}
+      height={340}
+      drag
+      onPeelProgress={(progress) => {
+        if (progress > 0.8 && index < photos.length - 1) {
+          setIndex((i) => i + 1);
+          reset();
+        }
+      }}
+    >
+      <PeelTop style={{ backgroundImage: `url(${current})`, backgroundSize: "cover" }} />
+      <PeelBack style={{ backgroundImage: `url(${current})`, backgroundSize: "cover" }} />
+      <PeelBottom
+        style={{
+          backgroundImage: next ? `url(${next})` : undefined,
+          backgroundColor: next ? undefined : "#eceff1",
+          backgroundSize: "cover",
         }}
-      >
-        <PeelTop
-          style={{
-            backgroundImage: `url(${currentPhoto.src})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          {currentPhoto.caption && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                background: "linear-gradient(transparent, rgba(0,0,0,0.7))",
-                color: "#fff",
-                padding: "20px 16px 16px",
-              }}
-            >
-              {currentPhoto.caption}
-            </div>
-          )}
-        </PeelTop>
-        <PeelBack
-          style={{
-            backgroundColor: "#f5f5dc",
-            backgroundImage: `url(${currentPhoto.src})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            filter: "brightness(0.9)",
-            transform: "scaleX(-1)",
-          }}
-        />
-        <PeelBottom
-          style={{
-            backgroundImage: nextPhotoData ? `url(${nextPhotoData.src})` : undefined,
-            backgroundColor: nextPhotoData ? undefined : "#e0e0e0",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          {!nextPhotoData && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "100%",
-                color: "#666",
-              }}
-            >
-              End of Album
-            </div>
-          )}
-        </PeelBottom>
-      </PeelWrapper>
-
-      {/* Navigation */}
-      <div style={{ marginTop: "16px", display: "flex", gap: "16px", alignItems: "center" }}>
-        <button
-          onClick={prevPhoto}
-          disabled={currentIndex === 0}
-          style={{
-            padding: "8px 16px",
-            cursor: currentIndex === 0 ? "not-allowed" : "pointer",
-            opacity: currentIndex === 0 ? 0.5 : 1,
-          }}
-        >
-          ← Previous
-        </button>
-        <span>
-          {currentIndex + 1} / {photos.length}
-        </span>
-        <button
-          onClick={nextPhoto}
-          disabled={currentIndex >= photos.length - 1}
-          style={{
-            padding: "8px 16px",
-            cursor: currentIndex >= photos.length - 1 ? "not-allowed" : "pointer",
-            opacity: currentIndex >= photos.length - 1 ? 0.5 : 1,
-          }}
-        >
-          Next →
-        </button>
-      </div>
-    </div>
+      />
+    </PeelWrapper>
   );
 }
 ```
@@ -157,50 +66,5 @@ export function PhotoAlbum({ photos, width = 300, height = 400 }: PhotoAlbumProp
 ## Usage
 
 ```tsx
-const photos = [
-  { src: "/photos/vacation-1.jpg", caption: "Beach sunset" },
-  { src: "/photos/vacation-2.jpg", caption: "Mountain hike" },
-  { src: "/photos/vacation-3.jpg", caption: "City lights" },
-  { src: "/photos/vacation-4.jpg", caption: "Local food" },
-];
-
-<PhotoAlbum photos={photos} width={350} height={450} />
-```
-
-## Variations
-
-### Polaroid Style
-
-```tsx
-function PolaroidAlbum({ photos }) {
-  return (
-    <div style={{ background: "#f5f5f5", padding: "40px" }}>
-      <PhotoAlbum
-        photos={photos}
-        width={280}
-        height={340}
-        style={{
-          border: "12px solid #fff",
-          borderBottom: "50px solid #fff",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-        }}
-      />
-    </div>
-  );
-}
-```
-
-### Magazine Spread
-
-```tsx
-function MagazineSpread({ leftPage, rightPage }) {
-  return (
-    <div style={{ display: "flex", boxShadow: "0 4px 20px rgba(0,0,0,0.2)" }}>
-      <div style={{ width: 250, height: 350, background: "#fff" }}>
-        {leftPage}
-      </div>
-      <PhotoAlbum photos={[rightPage]} width={250} height={350} />
-    </div>
-  );
-}
+<PhotoAlbum photos={["/photos/one.jpg", "/photos/two.jpg", "/photos/three.jpg"]} />
 ```

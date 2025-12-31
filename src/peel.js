@@ -241,6 +241,9 @@ export default function () {
     this.constraints = [];
     this.events = [];
     this.dragHandlers = [];
+    this.clipPaths = []; // Track clip paths created by this instance
+    this.createdElements = []; // Track dynamically created DOM elements for cleanup
+    this.setupSvgElement(); // Create instance-specific SVG element
     this.setupLayers();
     this.setupDimensions();
     this.setCorner(this.getOption("corner"));
@@ -488,15 +491,26 @@ export default function () {
   };
 
   /**
-   * Remove global svg elements.
+   * Sets up the instance-specific SVG element for clip paths.
+   * @private
+   */
+  Peel.prototype.setupSvgElement = function () {
+    this.svgElement = createSVGElement("svg", null, {
+      class: prefix("svg-clip-element"),
+    });
+    this.svgDefs = createSVGElement("defs", this.svgElement);
+  };
+
+  /**
+   * Remove this instance's svg element.
    * @public
    */
-  Peel.prototype.removeGlobalSvgElements = function () {
-    var globalSvgElements = document.getElementsByClassName(
-      prefix("svg-clip-element")
-    );
-
-    [...globalSvgElements].forEach((e) => e.remove());
+  Peel.prototype.removeSvgElement = function () {
+    if (this.svgElement && this.svgElement.parentNode) {
+      this.svgElement.parentNode.removeChild(this.svgElement);
+    }
+    this.svgElement = null;
+    this.svgDefs = null;
   };
 
   /**
@@ -505,7 +519,33 @@ export default function () {
    */
   Peel.prototype.clear = function () {
     this.removeEvents();
-    this.removeGlobalSvgElements();
+    this.removeSvgElement();
+  };
+
+  /**
+   * Remove all dynamically created DOM elements.
+   * @private
+   */
+  Peel.prototype.removeCreatedElements = function () {
+    // First restore wrapped elements to their original parent
+    if (this.wrappedElements) {
+      this.wrappedElements.forEach(function (wrapped) {
+        if (wrapped.element && wrapped.parent) {
+          removeClass(wrapped.element, prefix("shape-layer"));
+          wrapped.parent.appendChild(wrapped.element);
+        }
+      });
+      this.wrappedElements = [];
+    }
+    // Then remove created elements
+    if (this.createdElements) {
+      this.createdElements.forEach(function (el) {
+        if (el && el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
+      });
+      this.createdElements = [];
+    }
   };
 
   /**
@@ -757,6 +797,8 @@ export default function () {
     var el = getElement(this.getOption(optId) || "." + domId, parent);
     if (!el) {
       el = createElement(parent, domId);
+      // Track dynamically created elements for cleanup
+      this.createdElements.push(el);
     }
     addClass(el, prefix("layer"));
     setZIndex(el, zIndex);
@@ -846,9 +888,9 @@ export default function () {
       this.topLayer = this.wrapShapeLayer(this.topLayer, "top-outer-clip");
       this.backLayer = this.wrapShapeLayer(this.backLayer, "back-outer-clip");
 
-      this.topShapeClip = new SVGClip(topInnerLayer, shape);
-      this.backShapeClip = new SVGClip(backInnerLayer, shape);
-      this.bottomShapeClip = new SVGClip(this.bottomLayer, shape);
+      this.topShapeClip = new SVGClip(topInnerLayer, shape, this.svgDefs);
+      this.backShapeClip = new SVGClip(backInnerLayer, shape, this.svgDefs);
+      this.bottomShapeClip = new SVGClip(this.bottomLayer, shape, this.svgDefs);
 
       if (this.getOption("topShadowCreatesShape")) {
         this.topShadowElement = this.setupDropShadow(shape, topInnerLayer);
@@ -861,8 +903,8 @@ export default function () {
       );
     }
 
-    this.topClip = new SVGClip(this.topLayer);
-    this.backClip = new SVGClip(this.backLayer);
+    this.topClip = new SVGClip(this.topLayer, null, this.svgDefs);
+    this.backClip = new SVGClip(this.backLayer, null, this.svgDefs);
 
     this.backShadowElement = this.findOrCreateLayer(
       "back-shadow",
@@ -897,6 +939,8 @@ export default function () {
       class: prefix("layer"),
     });
     createSVGElement(shape.type, svg, shape.attributes);
+    // Track dynamically created elements for cleanup
+    this.createdElements.push(svg);
     return svg;
   };
 
@@ -913,6 +957,11 @@ export default function () {
     addClass(el, prefix("shape-layer"));
     var outerLayer = this.findOrCreateLayer(id, this.el, zIndex);
     outerLayer.appendChild(el);
+    // Track wrapped elements for restoration during cleanup
+    if (!this.wrappedElements) {
+      this.wrappedElements = [];
+    }
+    this.wrappedElements.push({ element: el, parent: this.el });
     return outerLayer;
   };
 
@@ -1317,13 +1366,15 @@ export default function () {
    *     clip path. Defaults to a polygon.
    * @constructor
    */
-  function SVGClip(el, shape) {
+  function SVGClip(el, shape, defs) {
     this.el = el;
+    this.defs = defs;
     this.shape = SVGClip.createClipPath(
       el,
       shape || {
         type: "polygon",
-      }
+      },
+      defs
     );
     // Chrome needs this for some reason for the clipping to work.
     setTransform(this.el, "translate(0px,0px)");
@@ -1346,33 +1397,18 @@ export default function () {
   // };
 
   /**
-   * Sets up the global SVG element and its nested defs object to use for new
-   * clip paths.
-   * @returns {SVGElement}
-   * @public
-   */
-  SVGClip.getDefs = function () {
-    if (!this.defs) {
-      this.svg = createSVGElement("svg", null, {
-        class: prefix("svg-clip-element"),
-      });
-      this.defs = createSVGElement("defs", this.svg);
-    }
-    return this.defs;
-  };
-
-  /**
    * Creates a new <clipPath> SVG element and sets the passed html element to be
-   * clipped by it.
+   * clipped by it. Uses the peel instance's own SVG defs element.
    * @param {HTMLElement} el The html element to be clipped.
    * @param {Object} obj An object defining the SVG element to be used in the
    *     clip path.
+   * @param {SVGElement} defs The defs element to append the clip path to.
    * @returns {SVGElement}
    * @public
    */
-  SVGClip.createClipPath = function (el, obj) {
+  SVGClip.createClipPath = function (el, obj, defs) {
     var id = SVGClip.getId();
-    var clipPath = createSVGElement("clipPath", this.getDefs());
+    var clipPath = createSVGElement("clipPath", defs);
     var svgEl = createSVGElement(obj.type, clipPath, obj.attributes);
     setSVGAttribute(clipPath, "id", id);
     setCSSClip(el, "url(#" + id + ")");

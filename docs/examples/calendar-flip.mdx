@@ -1,271 +1,86 @@
 # Calendar Flip
 
-An animated calendar with flip transitions between dates. Perfect for date pickers, countdown timers, or countdown widgets.
+A top-edge constrained flip works well for date tiles and calendars.
 
-## Preview
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
-A calendar that flips between dates with smooth animation.
+## Live Demo
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+  <div
+    style={{
+      width: 200,
+      padding: 12,
+      background: "#e53935",
+      color: "#fff",
+      textAlign: "center",
+      borderTopLeftRadius: 8,
+      borderTopRightRadius: 8,
+      fontWeight: "bold",
+    }}
+  >
+    Dec 2024
+  </div>
+  <PeelWrapper preset="calendar" width={200} height={180} drag>
+    <PeelTop
+      style={{
+        background: "#fff9c4",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div style={{ fontSize: 14, color: "#e53935", fontWeight: "bold" }}>Mon</div>
+      <div style={{ fontSize: 72, fontWeight: 300, color: "#333" }}>30</div>
+    </PeelTop>
+    <PeelBack style={{ background: "#f5f5f5" }} />
+    <PeelBottom
+      style={{
+        background: "#fff",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div style={{ fontSize: 14, color: "#e53935", fontWeight: "bold" }}>Tue</div>
+      <div style={{ fontSize: 72, fontWeight: 300, color: "#333" }}>31</div>
+    </PeelBottom>
+  </PeelWrapper>
+</div>
 
 ## Implementation
 
 ```tsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
 
-interface CalendarFlipProps {
-  initialDate?: Date;
-  onDateChange?: (date: Date) => void;
-}
+export function CalendarFlip() {
+  const [date, setDate] = useState(new Date());
+  const { peelRef, reset } = usePeel();
 
-export function CalendarFlip({
-  initialDate = new Date(),
-  onDateChange,
-}: CalendarFlipProps) {
-  const [currentDate, setCurrentDate] = useState(initialDate);
-  const { peelRef, animate, reset } = usePeel();
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  const formatDay = (date: Date) => date.getDate();
-  const formatWeekday = (date: Date) =>
-    date.toLocaleDateString("en-US", { weekday: "short" });
-  const formatMonth = (date: Date) =>
-    date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
-
-  const getNextDate = (date: Date) => {
-    const next = new Date(date);
-    next.setDate(next.getDate() + 1);
-    return next;
-  };
-
-  const getPrevDate = (date: Date) => {
-    const prev = new Date(date);
-    prev.setDate(prev.getDate() - 1);
-    return prev;
-  };
-
-  const flipToNext = async () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-
-    await animate({
-      to: { x: 100, y: 300 },
-      duration: 400,
-      easing: "easeOut",
-    });
-
-    const newDate = getNextDate(currentDate);
-    setCurrentDate(newDate);
-    onDateChange?.(newDate);
-    reset();
-    setIsAnimating(false);
-  };
-
-  const flipToPrev = () => {
-    if (isAnimating) return;
-    const newDate = getPrevDate(currentDate);
-    setCurrentDate(newDate);
-    onDateChange?.(newDate);
-    reset();
-  };
+  const nextDate = new Date(date);
+  nextDate.setDate(date.getDate() + 1);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      {/* Calendar header */}
-      <div
-        style={{
-          width: 200,
-          padding: "12px",
-          background: "#e53935",
-          color: "#fff",
-          textAlign: "center",
-          borderTopLeftRadius: "8px",
-          borderTopRightRadius: "8px",
-        }}
-      >
-        <div style={{ fontSize: "14px", fontWeight: "bold" }}>
-          {formatMonth(currentDate)}
-        </div>
-      </div>
-
-      {/* Calendar body with peel */}
-      <PeelWrapper
-        ref={peelRef}
-        preset="calendar"
-        width={200}
-        height={180}
-        drag
-        onPeelProgress={(progress) => {
-          if (progress > 0.6 && !isAnimating) {
-            flipToNext();
-          }
-        }}
-      >
-        <PeelTop
-          style={{
-            background: "#fff",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          <div style={{ fontSize: "14px", color: "#e53935", fontWeight: "bold" }}>
-            {formatWeekday(currentDate)}
-          </div>
-          <div style={{ fontSize: "72px", fontWeight: "300", color: "#333" }}>
-            {formatDay(currentDate)}
-          </div>
-        </PeelTop>
-        <PeelBack
-          style={{
-            background: "#f5f5f5",
-          }}
-        />
-        <PeelBottom
-          style={{
-            background: "#fff",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div style={{ fontSize: "14px", color: "#e53935", fontWeight: "bold" }}>
-            {formatWeekday(getNextDate(currentDate))}
-          </div>
-          <div style={{ fontSize: "72px", fontWeight: "300", color: "#333" }}>
-            {formatDay(getNextDate(currentDate))}
-          </div>
-        </PeelBottom>
-      </PeelWrapper>
-
-      {/* Navigation */}
-      <div
-        style={{
-          width: 200,
-          display: "flex",
-          justifyContent: "space-between",
-          marginTop: "12px",
-        }}
-      >
-        <button
-          onClick={flipToPrev}
-          disabled={isAnimating}
-          style={{
-            padding: "8px 16px",
-            background: "#f5f5f5",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          ← Prev
-        </button>
-        <button
-          onClick={() => {
-            setCurrentDate(new Date());
-            reset();
-          }}
-          style={{
-            padding: "8px 16px",
-            background: "#e53935",
-            color: "#fff",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Today
-        </button>
-        <button
-          onClick={flipToNext}
-          disabled={isAnimating}
-          style={{
-            padding: "8px 16px",
-            background: "#f5f5f5",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Next →
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Countdown flip clock variant
- */
-export function FlipClock() {
-  const [time, setTime] = useState(new Date());
-
-  useEffect(() => {
-    const interval = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const hours = time.getHours().toString().padStart(2, "0");
-  const minutes = time.getMinutes().toString().padStart(2, "0");
-  const seconds = time.getSeconds().toString().padStart(2, "0");
-
-  return (
-    <div style={{ display: "flex", gap: "8px", fontSize: "48px", fontFamily: "monospace" }}>
-      <FlipDigit value={hours} />
-      <span>:</span>
-      <FlipDigit value={minutes} />
-      <span>:</span>
-      <FlipDigit value={seconds} />
-    </div>
-  );
-}
-
-function FlipDigit({ value }: { value: string }) {
-  return (
-    <div
-      style={{
-        background: "#333",
-        color: "#fff",
-        padding: "8px 16px",
-        borderRadius: "4px",
+    <PeelWrapper
+      ref={peelRef}
+      preset="calendar"
+      width={200}
+      height={180}
+      drag
+      onPeelProgress={(progress) => {
+        if (progress > 0.6) {
+          setDate(nextDate);
+          reset();
+        }
       }}
     >
-      {value}
-    </div>
-  );
-}
-```
-
-## Usage
-
-```tsx
-<CalendarFlip
-  initialDate={new Date()}
-  onDateChange={(date) => console.log("Selected:", date)}
-/>
-```
-
-## Countdown Timer
-
-```tsx
-function CountdownToNewYear() {
-  const [daysLeft, setDaysLeft] = useState(0);
-
-  useEffect(() => {
-    const newYear = new Date(new Date().getFullYear() + 1, 0, 1);
-    const diff = Math.ceil((newYear.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-    setDaysLeft(diff);
-  }, []);
-
-  return (
-    <div style={{ textAlign: "center" }}>
-      <h2>Days Until New Year</h2>
-      <div style={{ fontSize: "96px", fontWeight: "bold", color: "#e53935" }}>
-        {daysLeft}
-      </div>
-    </div>
+      <PeelTop>{date.getDate()}</PeelTop>
+      <PeelBack style={{ background: "#f5f5f5" }} />
+      <PeelBottom>{nextDate.getDate()}</PeelBottom>
+    </PeelWrapper>
   );
 }
 ```

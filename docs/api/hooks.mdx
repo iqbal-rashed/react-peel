@@ -1,0 +1,208 @@
+# Hooks and Animations API
+
+This page covers the `usePeel` hook and animation utilities.
+
+import { usePeel } from "react-peel";
+
+## usePeel
+
+```tsx
+const {
+  peelRef,
+  animate,
+  reset,
+  setPosition,
+  getProgress,
+  stop,
+  isAnimating,
+} = usePeel();
+```
+
+### How to Use It
+
+`usePeel` gives you a ref plus helper methods. You attach `peelRef` to
+`PeelWrapper`, then call the helpers from event handlers or effects.
+
+```tsx
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
+
+function RevealCard() {
+  const { peelRef, animate, reset, isAnimating } = usePeel();
+
+  const handleReveal = async () => {
+    if (isAnimating()) return;
+    await animate({ to: { x: -80, y: -80 }, duration: 600, easing: "easeOut" });
+  };
+
+  return (
+    <>
+      <button onClick={handleReveal}>Reveal</button>
+      <button onClick={reset}>Reset</button>
+
+      <PeelWrapper ref={peelRef} height={200} width={200}>
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </>
+  );
+}
+```
+
+Notes:
+
+- The methods are no-ops until `peelRef.current` is set (after mount).
+- `reset()` returns to the current corner position.
+- If you pass `preset` or `corner`, those set the starting corner for resets.
+
+### Returned Values
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `peelRef` | `MutableRefObject` | Attach to `PeelWrapper` `ref`. |
+| `animate` | `(options) => Promise<void>` | Animate the peel position. |
+| `reset` | `() => void` | Reset peel to its corner. |
+| `setPosition` | `(x, y) => void` | Set peel position immediately. |
+| `getProgress` | `() => number` | Returns the clipped ratio (0 to 1). |
+| `stop` | `() => void` | Stop the current animation. |
+| `isAnimating` | `() => boolean` | Check if an animation is running. |
+
+### Animate Options
+
+```tsx
+await animate({
+  to: { x: 100, y: 100 },
+  from: { x: 200, y: 200 },
+  duration: 500,
+  easing: "easeOut",
+  onStart: () => {},
+  onEnd: () => {},
+  onProgress: (progress) => {},
+});
+```
+
+Supported easing names for `usePeel.animate`:
+
+- `linear`
+- `easeIn`
+- `easeOut`
+- `easeInOut`
+- `spring`
+
+### Common Patterns
+
+Programmatic reveal based on user progress:
+
+```tsx
+<PeelWrapper
+  ref={peelRef}
+  drag
+  onPeelProgress={(progress) => {
+    if (progress > 0.6 && !isAnimating()) {
+      animate({ to: { x: 0, y: 0 }, duration: 250 });
+    }
+  }}
+>
+  ...
+</PeelWrapper>
+```
+
+Set the peel position directly (no animation):
+
+```tsx
+setPosition(40, 60);
+```
+
+## easings
+
+The utility easing set used by the lower-level animation helpers:
+
+```tsx
+import { easings } from "react-peel";
+
+// Available: linear, easeIn, easeOut, easeInOut,
+// easeInQuad, easeOutQuad, easeInOutQuad,
+// easeInExpo, easeOutExpo, spring, bounce, backOut
+const value = easings.easeOut(0.5);
+```
+
+## animate
+
+Generic value animator.
+
+```tsx
+import { animate } from "react-peel";
+
+const { stop, finished } = animate({
+  from: 0,
+  to: 100,
+  duration: 500,
+  easing: "easeOut",
+  onUpdate: (value) => console.log(value),
+  onComplete: () => console.log("done"),
+});
+
+await finished;
+```
+
+## animatePeelPosition
+
+Animate a peel instance directly.
+
+```tsx
+import { animatePeelPosition } from "react-peel";
+
+animatePeelPosition({
+  peel: peelRef.current,
+  from: { x: 200, y: 200 },
+  to: { x: 50, y: 50 },
+  duration: 600,
+  easing: "easeInOut",
+});
+```
+
+## loopPeel
+
+Loop an animation along a path.
+
+```tsx
+import { loopPeel } from "react-peel";
+
+const stop = loopPeel({
+  peel: peelRef.current,
+  path: [200, 200, -200, -200],
+  duration: 1000,
+  pingPong: true,
+});
+
+stop();
+```
+
+## peelHint
+
+Create a subtle peel hint.
+
+```tsx
+import { peelHint } from "react-peel";
+
+await peelHint(peelRef.current, {
+  peekSize: 30,
+  duration: 300,
+  repeat: 2,
+});
+```
+
+## Types
+
+```tsx
+import type {
+  UsePeelReturn,
+  AnimatePeelOptions,
+  EasingName,
+  EasingFunction,
+  AnimateOptions,
+  AnimationController,
+  AnimatePeelPositionOptions,
+  LoopPeelOptions,
+} from "react-peel";
+```

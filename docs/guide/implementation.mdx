@@ -1,0 +1,1961 @@
+import { useEffect, useState, useRef } from "react";
+import {
+  PeelWrapper,
+  PeelTop,
+  PeelBack,
+  PeelBottom,
+  usePeel,
+  peelHint,
+  loopPeel,
+} from "react-peel";
+
+{/* Demo Components */}
+
+export const AnimatedRevealDemo = () => {
+  const { peelRef, animate, reset } = usePeel();
+  const [revealed, setRevealed] = useState(false);
+
+  const handleReveal = async () => {
+    await animate({
+      to: { x: -50, y: -50 },
+      duration: 800,
+      easing: "easeOut",
+      onProgress: (progress) => {
+        if (progress > 0.8) setRevealed(true);
+      },
+    });
+  };
+
+  return (
+
+    <div>
+
+
+      <PeelWrapper ref={peelRef} height={200} width={200}>
+        <PeelTop style={{ backgroundColor: "#90caf9", padding: "20px" }}>
+          <h3>Click Reveal</h3>
+        </PeelTop>
+        <PeelBack style={{ backgroundColor: "#64b5f6" }} />
+        <PeelBottom
+          style={{ backgroundColor: "#1976d2", color: "#fff", padding: "20px" }}
+        >
+          <h3>{revealed ? "Surprise" : "..."}</h3>
+        </PeelBottom>
+      </PeelWrapper>
+
+      <div style={{ marginTop: "16px", display: "flex", gap: "8px" }}>
+        <button onClick={handleReveal}>Reveal</button>
+        <button
+          onClick={() => {
+            reset();
+            setRevealed(false);
+          }} >
+          Reset
+        </button>
+      </div>
+    </div>
+
+  );
+};
+
+export const HintDemo = () => {
+  const { peelRef } = usePeel();
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (peelRef.current) {
+        await peelHint(peelRef.current, {
+          peekSize: 40,
+          duration: 400,
+          repeat: 3,
+        });
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+
+  }, [peelRef]);
+
+  return (
+
+    <PeelWrapper ref={peelRef} height={200} width={200} drag>
+      <PeelTop style={{ backgroundColor: "#81afcb" }} />
+      <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+      <PeelBottom style={{ backgroundColor: "#688394" }} />
+    </PeelWrapper>
+
+  );
+};
+
+export const ControlledPositionDemo = () => {
+  const [t, setT] = useState(0.4);
+  const size = 200;
+  const pos = { x: size - size * t, y: size - size * t };
+
+  return (
+
+    <div>
+      <div style={{ marginBottom: "12px" }}>
+        <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <span>Progress</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={t}
+            onChange={(e) => setT(Number(e.target.value))}
+          />
+          <span>{t.toFixed(2)}</span>
+        </label>
+      </div>
+      <PeelWrapper height={size} width={size} peelPosition={pos}>
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+
+  );
+};
+
+export const TimeAlongPathDemo = () => {
+  const [t, setT] = useState(0.5);
+
+  return (
+
+    <div>
+      <div style={{ marginBottom: "12px" }}>
+        <label style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <span>Time Along Path</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={t}
+            onChange={(e) => setT(Number(e.target.value))}
+          />
+          <span>{t.toFixed(2)}</span>
+        </label>
+      </div>
+      <PeelWrapper
+        height={200}
+        width={200}
+        peelPath={[200, 200, -200, -200]}
+        timeAlongPath={t}
+      >
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+
+  );
+};
+
+export const DisabledToggleDemo = () => {
+  const [disabled, setDisabled] = useState(true);
+
+  return (
+
+    <div>
+      <button onClick={() => setDisabled((value) => !value)}>
+        {disabled ? "Enable" : "Disable"}
+      </button>
+      <div style={{ marginTop: "12px" }}>
+        <PeelWrapper height={200} width={200} drag disabled={disabled}>
+          <PeelTop style={{ backgroundColor: "#81afcb" }} />
+          <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+          <PeelBottom style={{ backgroundColor: "#688394" }} />
+        </PeelWrapper>
+      </div>
+    </div>
+
+  );
+};
+
+export const PressHandlerDemo = () => {
+  const [pressed, setPressed] = useState(false);
+
+  return (
+
+    <PeelWrapper
+      height={200}
+      width={200}
+      handlePress={() => setPressed((value) => !value)}
+    >
+      <PeelTop
+        style={{
+          backgroundColor: "#81afcb",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#fff",
+          fontWeight: 600,
+        }}
+      >
+        {pressed ? "Pressed" : "Click"}
+      </PeelTop>
+      <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+      <PeelBottom style={{ backgroundColor: "#688394" }} />
+    </PeelWrapper>
+
+  )
+};
+
+export const LoopingAnimationDemo = () => {
+  const { peelRef } = usePeel();
+  const stopRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handleToggle = () => {
+    if (isPlaying && stopRef.current) {
+      stopRef.current();
+      stopRef.current = null;
+      setIsPlaying(false);
+    } else if (peelRef.current) {
+      stopRef.current = loopPeel({
+        peel: peelRef.current,
+        path: [200, 200, 100, 0, 0, 100, -200, -200],
+        duration: 2000,
+        easing: "easeInOut",
+        pingPong: true,
+      });
+      setIsPlaying(true);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (stopRef.current) stopRef.current();
+    };
+  }, []);
+
+  return (
+
+    <div>
+      <button onClick={handleToggle} style={{ marginBottom: "12px" }}>
+        {isPlaying ? "Stop" : "Start Loop"}
+      </button>
+      <PeelWrapper ref={peelRef} height={200} width={200}>
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+
+  );
+};
+
+export const ProgressCallbackDemo = () => {
+  const [progress, setProgress] = useState(0);
+
+  return (
+
+    <div>
+      <div style={{ marginBottom: "12px" }}>
+        <strong>Progress:</strong> {(progress * 100).toFixed(0)}%
+        <div
+          style={{
+            height: "8px",
+            backgroundColor: "#546e7a",
+            borderRadius: "4px",
+            marginTop: "8px",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${progress * 100}%`,
+              backgroundColor: "#4caf50",
+              borderRadius: "4px",
+              transition: "width 0.1s",
+            }}
+          />
+        </div>
+      </div>
+      <PeelWrapper
+        height={200}
+        width={200}
+        drag
+        onPeelProgress={(p) => setProgress(p)}
+      >
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+
+  );
+};
+
+export const EventCallbacksDemo = () => {
+  const [status, setStatus] = useState("Ready");
+
+  return (
+
+    <div>
+      <div
+        style={{
+          marginBottom: "12px",
+          padding: "8px",
+          backgroundColor: "#455a64",
+          borderRadius: "4px",
+          color: "#fff",
+        }}
+      >
+        Status: <strong>{status}</strong>
+      </div>
+      <PeelWrapper
+        height={200}
+        width={200}
+        drag
+        onPeelStart={() => setStatus("Peeling started!")}
+        onPeelEnd={() => setStatus("Peeling ended!")}
+      >
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+
+  );
+};
+
+export const MultipleConstraintsDemo = () => {
+  return (
+    <PeelWrapper
+      height={200}
+      width={200}
+      constraints={["BOTTOM_LEFT", "BOTTOM_RIGHT"]}
+      drag
+    >
+      <PeelTop style={{ backgroundColor: "#81afcb" }} />
+      <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+      <PeelBottom style={{ backgroundColor: "#688394" }} />
+    </PeelWrapper>
+  );
+};
+
+export const ImagePeelDemo = () => {
+  return (
+    <PeelWrapper height={200} width={300} drag>
+      <PeelTop
+        style={{
+          backgroundImage: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#fff",
+          fontSize: "18px",
+          fontWeight: 600,
+        }}
+      >
+        Peel Me!
+      </PeelTop>
+      <PeelBack
+        style={{
+          backgroundImage: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+        }}
+      />
+      <PeelBottom
+        style={{
+          backgroundImage: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "#fff",
+          fontSize: "24px",
+          fontWeight: 600,
+        }}
+      >
+        🎉 Hidden Content!
+      </PeelBottom>
+    </PeelWrapper>
+  );
+};
+
+export const SequentialAnimationDemo = () => {
+  const { peelRef, animate, reset } = usePeel();
+
+  const runSequence = async () => {
+    await animate({
+      to: { x: 150, y: 150 },
+      duration: 400,
+      easing: "easeOut",
+    });
+    await new Promise((r) => setTimeout(r, 200));
+    await animate({
+      to: { x: 180, y: 180 },
+      duration: 200,
+      easing: "easeIn",
+    });
+    await animate({
+      to: { x: -50, y: -50 },
+      duration: 600,
+      easing: "easeOut",
+    });
+  };
+
+  return (
+
+    <div>
+      <div style={{ marginBottom: "12px", display: "flex", gap: "8px" }}>
+        <button onClick={runSequence}>Run Sequence</button>
+        <button onClick={reset}>Reset</button>
+      </div>
+      <PeelWrapper ref={peelRef} height={200} width={200}>
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+
+  );
+};
+
+export const StarShapeDemo = () => {
+  return (
+    <PeelWrapper
+      height={200}
+      width={200}
+      options={{
+        shape: {
+          polygon: {
+            points: "100,10 40,198 190,78 10,78 160,198",
+          },
+        },
+      }}
+      corner={{ x: 100, y: 198 }}
+      peelPosition={{ x: 140, y: 60 }}
+      drag
+    >
+      <PeelTop style={{ backgroundColor: "#ffd700" }} />
+      <PeelBack style={{ backgroundColor: "#ffec8b" }} />
+      <PeelBottom style={{ backgroundColor: "#cd853f" }} />
+    </PeelWrapper>
+  );
+};
+
+export const EllipseShapeDemo = () => {
+  return (
+    <PeelWrapper
+      height={150}
+      width={250}
+      options={{
+        shape: {
+          path: {
+            d: "M125,10 C200,10 240,40 240,75 C240,110 200,140 125,140 C50,140 10,110 10,75 C10,40 50,10 125,10 Z",
+          },
+        },
+      }}
+      peelPosition={{ x: 180, y: 50 }}
+      drag
+    >
+      <PeelTop style={{ backgroundColor: "#81afcb" }} />
+      <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+      <PeelBottom style={{ backgroundColor: "#688394" }} />
+    </PeelWrapper>
+  );
+};
+
+# Implementation Guide
+
+This comprehensive guide provides live demos and code examples for implementing peel effects in your React applications. Each example includes an interactive preview and copy-ready code snippets.
+
+React Peel offers three main ways to create peel effects:
+
+1. **Declarative Props** - Use `PeelWrapper` props for static or controlled peels
+2. **Presets** - Pre-configured effects for common use cases
+3. **Programmatic Control** - Use the `usePeel` hook for animations and fine-grained control
+
+---
+
+## Quick Start
+
+The simplest way to create a peel effect:
+
+```tsx
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+<PeelWrapper height={200} width={200} drag>
+  <PeelTop>Your top content</PeelTop>
+  <PeelBack>Back of the peel</PeelBack>
+  <PeelBottom>Hidden content revealed</PeelBottom>
+</PeelWrapper>;
+```
+
+---
+
+## Static Examples
+
+### Simple Peel
+
+Basic peel effect with a static position:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper height={200} width={200} peelPosition={{ x: 80, y: 120 }}>
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+<PeelWrapper height={200} width={200} peelPosition={{ x: 80, y: 120 }}>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>;
+```
+
+### Controlled Peel Position
+
+Drive peel position directly from state:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <ControlledPositionDemo />
+</div>
+
+```tsx
+import React, { useState } from "react";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+function ControlledPosition() {
+  const [t, setT] = useState(0.4);
+  const size = 200;
+  const pos = { x: size - size * t, y: size - size * t };
+
+  return (
+    <div>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value={t}
+        onChange={(e) => setT(Number(e.target.value))}
+      />
+      <PeelWrapper height={size} width={size} peelPosition={pos}>
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+  );
+}
+```
+
+### Corner Selection
+
+Peel from different corners:
+
+<div
+  style={{
+    padding: "20px",
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+    gap: "16px",
+  }}
+>
+  <PeelWrapper
+    corner="TOP_LEFT"
+    height={160}
+    width={160}
+    peelPosition={{ x: 60, y: 50 }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+  <PeelWrapper
+    corner="TOP_RIGHT"
+    height={160}
+    width={160}
+    peelPosition={{ x: 120, y: 50 }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+  <PeelWrapper
+    corner="BOTTOM_LEFT"
+    height={160}
+    width={160}
+    peelPosition={{ x: 60, y: 120 }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+// Top left corner
+<PeelWrapper corner="TOP_LEFT" height={160} width={160} peelPosition={{ x: 80, y: 70 }}>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+
+// Top right corner
+<PeelWrapper corner="TOP_RIGHT" height={160} width={160} peelPosition={{ x: 120, y: 70 }}>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+
+// Bottom left corner
+<PeelWrapper corner="BOTTOM_LEFT" height={160} width={160} peelPosition={{ x: 80, y: 130 }}>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Custom Shadows
+
+Fine-tune shadow effects:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{
+      topShadow: false,
+      backShadowSize: 0.12,
+      bottomShadowDarkAlpha: 1,
+      bottomShadowLightAlpha: 0.4,
+    }}
+    peelPosition={{ x: 150, y: 0 }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper
+  height={200}
+  width={200}
+  options={{
+    topShadow: false,
+    backShadowSize: 0.12,
+    bottomShadowDarkAlpha: 1,
+    bottomShadowLightAlpha: 0.4,
+  }}
+  peelPosition={{ x: 150, y: 0 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Shiny Reflection
+
+Add a reflective sheen to the back layer:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{
+      backReflection: true,
+      backReflectionAlpha: 0.3,
+    }}
+    peelPosition={{ x: 150, y: 0 }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper
+  height={200}
+  width={200}
+  options={{
+    backReflection: true,
+    backReflectionAlpha: 0.3,
+  }}
+  peelPosition={{ x: 150, y: 0 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+---
+
+## Custom Shapes
+
+React Peel supports custom SVG shapes for unique peel effects.
+
+### Circle Shape
+
+Use SVG shapes for custom clipping:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{
+      shape: {
+        circle: { cx: 100, cy: 100, r: 100 },
+      },
+    }}
+    peelPosition={{ x: 100, y: 80 }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper
+  options={{
+    shape: {
+      circle: { cx: 100, cy: 100, r: 100 },
+    },
+  }}
+  peelPosition={{ x: 100, y: 80 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Polygon Shape (Pentagon)
+
+Clip to a polygon:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{
+      shape: {
+        polygon: {
+          points: "100,0 200,70 160,200 40,200 0,70",
+        },
+      },
+    }}
+    peelPosition={{ x: 120, y: 60 }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper
+  options={{
+    shape: {
+      polygon: {
+        points: "100,0 200,70 160,200 40,200 0,70",
+      },
+    },
+  }}
+  peelPosition={{ x: 120, y: 60 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Star Shape
+
+Five-pointed star using polygon:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <StarShapeDemo />
+</div>
+
+```tsx
+<PeelWrapper
+  height={200}
+  width={200}
+  options={{
+    shape: {
+      polygon: {
+        points: "100,10 40,198 190,78 10,78 160,198",
+      },
+    },
+  }}
+  corner={{ x: 100, y: 198 }}
+  peelPosition={{ x: 140, y: 60 }}
+  drag
+>
+  <PeelTop style={{ backgroundColor: "#ffd700" }} />
+  <PeelBack style={{ backgroundColor: "#ffec8b" }} />
+  <PeelBottom style={{ backgroundColor: "#cd853f" }} />
+</PeelWrapper>
+```
+
+### Heart Shape
+
+Custom SVG path shape:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    options={{
+      shape: {
+        path: {
+          d: "M101.26,31.42 C122.40,-11.27 173.11,1.11 183.01,11.84 C237.31,70.73 142.52,119.35 101.26,174.57 C51.81,119.35 -39.07,68.31 18.45,11.84 C33.18,-2.62 77.79,-11.27 101.26,31.42 Z",
+        },
+      },
+    }}
+    corner={{ x: 101, y: 175 }}
+    peelPosition={{ x: 150, y: 0 }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper
+  options={{
+    shape: {
+      path: {
+        d: "M101.26,31.42 C122.40,-11.27 173.11,1.11 183.01,11.84 C237.31,70.73 142.52,119.35 101.26,174.57 C51.81,119.35 -39.07,68.31 18.45,11.84 C33.18,-2.62 77.79,-11.27 101.26,31.42 Z",
+      },
+    },
+  }}
+  corner={{ x: 101, y: 175 }}
+  peelPosition={{ x: 150, y: 0 }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Ellipse Shape (via Path)
+
+Oval shape using SVG path:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <EllipseShapeDemo />
+</div>
+
+```tsx
+<PeelWrapper
+  height={150}
+  width={250}
+  options={{
+    shape: {
+      path: {
+        d: "M125,10 C200,10 240,40 240,75 C240,110 200,140 125,140 C50,140 10,110 10,75 C10,40 50,10 125,10 Z",
+      },
+    },
+  }}
+  peelPosition={{ x: 180, y: 50 }}
+  drag
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+---
+
+## Interactive Examples
+
+### Dragging
+
+Enable mouse or touch dragging:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper height={200} width={200} drag>
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper height={200} width={200} drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Disabled State
+
+Toggle interactions on and off:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <DisabledToggleDemo />
+</div>
+
+```tsx
+import React, { useState } from "react";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+function DisabledExample() {
+  const [disabled, setDisabled] = useState(true);
+
+  return (
+    <div>
+      <button onClick={() => setDisabled((value) => !value)}>
+        {disabled ? "Enable" : "Disable"}
+      </button>
+      <PeelWrapper height={200} width={200} drag disabled={disabled}>
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+  );
+}
+```
+
+### Press Handler
+
+Handle taps or clicks without dragging:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PressHandlerDemo />
+</div>
+
+```tsx
+import React, { useState } from "react";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+function PressHandlerExample() {
+  const [pressed, setPressed] = useState(false);
+
+  return (
+    <PeelWrapper
+      height={200}
+      width={200}
+      handlePress={() => setPressed((v) => !v)}
+    >
+      <PeelTop style={{ backgroundColor: "#81afcb", color: "#fff" }}>
+        {pressed ? "Pressed" : "Click"}
+      </PeelTop>
+      <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+      <PeelBottom style={{ backgroundColor: "#688394" }} />
+    </PeelWrapper>
+  );
+}
+```
+
+### Constrained Peel
+
+Limit peel distance with constraints:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper height={200} width={200} constraints="BOTTOM_LEFT" drag>
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper constraints="BOTTOM_LEFT" drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Multiple Constraints
+
+Apply multiple constraints for complex behavior:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <MultipleConstraintsDemo />
+</div>
+
+```tsx
+<PeelWrapper
+  height={200}
+  width={200}
+  constraints={["BOTTOM_LEFT", "BOTTOM_RIGHT"]}
+  drag
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Book Mode
+
+Create a page-turning effect:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper height={160} width={130} mode="book" drag>
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper height={160} width={130} mode="book" drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Calendar Mode
+
+Top-edge constrained flip:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper height={200} width={150} mode="calendar" drag>
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper height={200} width={150} mode="calendar" drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Fade Out Effect
+
+Fade the top layer as it peels:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper height={200} width={200} fadeThreshold={0.9} drag>
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper fadeThreshold={0.9} drag>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Custom Drag Handler
+
+Control behavior during drag:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    fadeThreshold={0.9}
+    handleDrag={(evt, x, y, peel) => {
+      peel.setPeelPosition(x, y);
+      if (peel.getAmountClipped() >= 1) {
+        peel.removeEvents();
+      }
+    }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper
+  fadeThreshold={0.9}
+  handleDrag={(evt, x, y, peel) => {
+    peel.setPeelPosition(x, y);
+    if (peel.getAmountClipped() >= 1) {
+      peel.removeEvents();
+    }
+  }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Gradient Background Peel
+
+Use gradients for beautiful effects:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <ImagePeelDemo />
+</div>
+
+```tsx
+<PeelWrapper height={200} width={300} drag>
+  <PeelTop
+    style={{
+      backgroundImage: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#fff",
+      fontSize: "18px",
+      fontWeight: 600,
+    }}
+  >
+    Peel Me!
+  </PeelTop>
+  <PeelBack
+    style={{
+      backgroundImage: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+    }}
+  />
+  <PeelBottom
+    style={{
+      backgroundImage: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#fff",
+      fontSize: "24px",
+      fontWeight: 600,
+    }}
+  >
+    🎉 Hidden Content!
+  </PeelBottom>
+</PeelWrapper>
+```
+
+---
+
+## Event Callbacks
+
+React Peel provides callbacks to track peel state.
+
+### Progress Callback
+
+Monitor peel progress in real-time:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <ProgressCallbackDemo />
+</div>
+
+```tsx
+import React, { useState } from "react";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+function ProgressExample() {
+  const [progress, setProgress] = useState(0);
+
+  return (
+    <div>
+      <div>Progress: {(progress * 100).toFixed(0)}%</div>
+      <PeelWrapper
+        height={200}
+        width={200}
+        drag
+        onPeelProgress={(p) => setProgress(p)}
+      >
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+  );
+}
+```
+
+### Start/End Callbacks
+
+Detect when peeling starts and ends:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <EventCallbacksDemo />
+</div>
+
+```tsx
+import React, { useState } from "react";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+function EventCallbacksExample() {
+  const [status, setStatus] = useState("Ready");
+
+  return (
+    <div>
+      <div>Status: {status}</div>
+      <PeelWrapper
+        height={200}
+        width={200}
+        drag
+        onPeelStart={() => setStatus("Peeling started!")}
+        onPeelEnd={() => setStatus("Peeling ended!")}
+      >
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+  );
+}
+```
+
+---
+
+## Path Animation Examples
+
+### Linear Path
+
+Animate along a straight line:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    height={200}
+    width={200}
+    peelPath={[200, 200, -200, -200]}
+    handleDrag={(evt, x, y, p) => {
+      const t = (x - p.width) / -p.width;
+      p.setTimeAlongPath(t);
+    }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper
+  peelPath={[200, 200, -200, -200]}
+  handleDrag={(evt, x, y, p) => {
+    const t = (x - p.width) / -p.width;
+    p.setTimeAlongPath(t);
+  }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Bezier Curve Path
+
+Smooth curved path animation:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    height={160}
+    width={130}
+    peelPath={[130, 160, 50, 60, -70, 210, -130, 160]}
+    handleDrag={(evt, x, y, p) => {
+      const t = (x - p.width) / (-p.width * 2);
+      p.setTimeAlongPath(t);
+    }}
+  >
+    <PeelTop style={{ backgroundColor: "#81afcb" }} />
+    <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+    <PeelBottom style={{ backgroundColor: "#688394" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper
+  peelPath={[130, 160, 50, 60, -70, 210, -130, 160]}
+  handleDrag={(evt, x, y, p) => {
+    const t = (x - p.width) / (-p.width * 2);
+    p.setTimeAlongPath(t);
+  }}
+>
+  <PeelTop style={{ backgroundColor: "#81afcb" }} />
+  <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+  <PeelBottom style={{ backgroundColor: "#688394" }} />
+</PeelWrapper>
+```
+
+### Time Along Path
+
+Control the peel with a slider:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <TimeAlongPathDemo />
+</div>
+
+```tsx
+import React, { useState } from "react";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+function TimeAlongPathExample() {
+  const [t, setT] = useState(0.5);
+
+  return (
+    <div>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value={t}
+        onChange={(e) => setT(Number(e.target.value))}
+      />
+      <PeelWrapper
+        height={200}
+        width={200}
+        peelPath={[200, 200, -200, -200]}
+        timeAlongPath={t}
+      >
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+  );
+}
+```
+
+---
+
+## Using Presets
+
+Presets provide pre-configured options for common use cases.
+
+### Available Presets
+
+<table>
+  <thead>
+    <tr>
+      <th>Preset</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>stickyNote</td>
+      <td>Small corner curl like a sticky note</td>
+    </tr>
+    <tr>
+      <td>pageFlip</td>
+      <td>Book-like page turn with spine constraint</td>
+    </tr>
+    <tr>
+      <td>revealCard</td>
+      <td>Scratch-off style reveal</td>
+    </tr>
+    <tr>
+      <td>calendar</td>
+      <td>Top-edge constrained calendar flip</td>
+    </tr>
+    <tr>
+      <td>envelope</td>
+      <td>Envelope flap opening</td>
+    </tr>
+    <tr>
+      <td>giftCard</td>
+      <td>Dramatic reveal with reflection</td>
+    </tr>
+    <tr>
+      <td>photoAlbum</td>
+      <td>Smooth page turn for galleries</td>
+    </tr>
+    <tr>
+      <td>scratchCard</td>
+      <td>Lottery ticket scratch-off</td>
+    </tr>
+  </tbody>
+</table>
+
+### Sticky Note Preset
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper preset="stickyNote" height={150} width={150} drag>
+    <PeelTop
+      style={{
+        backgroundColor: "#fff9c4",
+        padding: "12px",
+        fontFamily: "cursive",
+        color: "#333",
+      }}
+    >
+      Remember to call mom
+    </PeelTop>
+    <PeelBack style={{ backgroundColor: "#fff59d" }} />
+    <PeelBottom style={{ backgroundColor: "#78909c" }} />
+  </PeelWrapper>
+</div>
+
+```tsx
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+<PeelWrapper preset="stickyNote" height={150} width={150} drag>
+  <PeelTop
+    style={{
+      backgroundColor: "#fff9c4",
+      padding: "12px",
+      fontFamily: "cursive",
+      color: "#333",
+    }}
+  >
+    Remember to call mom
+  </PeelTop>
+  <PeelBack style={{ backgroundColor: "#fff59d" }} />
+  <PeelBottom style={{ backgroundColor: "#78909c" }} />
+</PeelWrapper>;
+```
+
+### Scratch Card Preset
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper preset="scratchCard" height={100} width={200} drag>
+    <PeelTop
+      style={{
+        backgroundColor: "#9e9e9e",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#fff",
+      }}
+    >
+      Scratch to reveal
+    </PeelTop>
+    <PeelBack style={{ backgroundColor: "#bdbdbd" }} />
+    <PeelBottom
+      style={{
+        backgroundColor: "#4caf50",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#fff",
+        fontSize: "24px",
+      }}
+    >
+      YOU WON
+    </PeelBottom>
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper preset="scratchCard" height={100} width={200} drag>
+  <PeelTop
+    style={{
+      backgroundColor: "#9e9e9e",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#fff",
+    }}
+  >
+    Scratch to reveal
+  </PeelTop>
+  <PeelBack style={{ backgroundColor: "#bdbdbd" }} />
+  <PeelBottom
+    style={{
+      backgroundColor: "#4caf50",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#fff",
+      fontSize: "24px",
+    }}
+  >
+    YOU WON
+  </PeelBottom>
+</PeelWrapper>
+```
+
+### Preset Overrides
+
+Override preset options to tune the look:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    preset="giftCard"
+    height={160}
+    width={260}
+    drag
+    options={{
+      topShadowBlur: 8,
+      backReflection: true,
+      backReflectionAlpha: 0.35,
+    }}
+  >
+    <PeelTop
+      style={{ backgroundColor: "#667eea", color: "#fff", padding: "16px" }}
+    >
+      Gift Card
+    </PeelTop>
+    <PeelBack style={{ backgroundColor: "#5e60ce" }} />
+    <PeelBottom style={{ backgroundColor: "#b39ddb", padding: "16px", color: "#1a1a2e" }}>
+      CODE-123
+    </PeelBottom>
+  </PeelWrapper>
+</div>
+
+```tsx
+<PeelWrapper
+  preset="giftCard"
+  height={160}
+  width={260}
+  drag
+  options={{
+    topShadowBlur: 8,
+    backReflection: true,
+    backReflectionAlpha: 0.35,
+  }}
+>
+  <PeelTop
+    style={{ backgroundColor: "#667eea", color: "#fff", padding: "16px" }}
+  >
+    Gift Card
+  </PeelTop>
+  <PeelBack style={{ backgroundColor: "#5e60ce" }} />
+  <PeelBottom style={{ backgroundColor: "#b39ddb", padding: "16px", color: "#1a1a2e" }}>
+    CODE-123
+  </PeelBottom>
+</PeelWrapper>
+```
+
+---
+
+## Using the usePeel Hook
+
+The `usePeel` hook provides programmatic control over peel animations.
+
+### Hook API
+
+```tsx
+const { peelRef, animate, reset, setPosition, getProgress, stop, isAnimating } =
+  usePeel();
+```
+
+<table>
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>peelRef</td>
+      <td>
+        Ref to attach to <code>PeelWrapper</code>
+      </td>
+    </tr>
+    <tr>
+      <td>animate(options)</td>
+      <td>Animate peel to a position</td>
+    </tr>
+    <tr>
+      <td>reset()</td>
+      <td>Reset to initial corner position</td>
+    </tr>
+    <tr>
+      <td>setPosition(x, y)</td>
+      <td>Set position immediately</td>
+    </tr>
+    <tr>
+      <td>getProgress()</td>
+      <td>Get current progress (0-1)</td>
+    </tr>
+    <tr>
+      <td>stop()</td>
+      <td>Stop current animation</td>
+    </tr>
+    <tr>
+      <td>isAnimating()</td>
+      <td>Check if animating</td>
+    </tr>
+  </tbody>
+</table>
+
+### Animated Reveal
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <AnimatedRevealDemo />
+</div>
+
+```tsx
+import React, { useState } from "react";
+import {
+  PeelWrapper,
+  PeelTop,
+  PeelBack,
+  PeelBottom,
+  usePeel,
+} from "react-peel";
+
+function AnimatedReveal() {
+  const { peelRef, animate, reset } = usePeel();
+  const [revealed, setRevealed] = useState(false);
+
+  const handleReveal = async () => {
+    await animate({
+      to: { x: -50, y: -50 },
+      duration: 800,
+      easing: "easeOut",
+      onProgress: (progress) => {
+        if (progress > 0.8) setRevealed(true);
+      },
+    });
+  };
+
+  return (
+    <div>
+      <div style={{ marginBottom: "16px" }}>
+        <button onClick={handleReveal}>Reveal</button>
+        <button
+          onClick={() => {
+            reset();
+            setRevealed(false);
+          }}
+        >
+          Reset
+        </button>
+      </div>
+
+      <PeelWrapper ref={peelRef} height={200} width={200}>
+        <PeelTop style={{ backgroundColor: "#90caf9", padding: "20px" }}>
+          <h3>Click Reveal</h3>
+        </PeelTop>
+        <PeelBack style={{ backgroundColor: "#64b5f6" }} />
+        <PeelBottom
+          style={{ backgroundColor: "#1976d2", color: "#fff", padding: "20px" }}
+        >
+          <h3>{revealed ? "Surprise" : "..."}</h3>
+        </PeelBottom>
+      </PeelWrapper>
+    </div>
+  );
+}
+```
+
+### Sequential Animation
+
+Chain multiple animations:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <SequentialAnimationDemo />
+</div>
+
+```tsx
+import React from "react";
+import {
+  PeelWrapper,
+  PeelTop,
+  PeelBack,
+  PeelBottom,
+  usePeel,
+} from "react-peel";
+
+function SequentialAnimation() {
+  const { peelRef, animate, reset } = usePeel();
+
+  const runSequence = async () => {
+    // First peek
+    await animate({
+      to: { x: 150, y: 150 },
+      duration: 400,
+      easing: "easeOut",
+    });
+    // Pause
+    await new Promise((r) => setTimeout(r, 200));
+    // Pull back slightly
+    await animate({
+      to: { x: 180, y: 180 },
+      duration: 200,
+      easing: "easeIn",
+    });
+    // Full reveal
+    await animate({
+      to: { x: -50, y: -50 },
+      duration: 600,
+      easing: "easeOut",
+    });
+  };
+
+  return (
+    <div>
+      <button onClick={runSequence}>Run Sequence</button>
+      <button onClick={reset}>Reset</button>
+      <PeelWrapper ref={peelRef} height={200} width={200}>
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+  );
+}
+```
+
+### Hint Animation
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <HintDemo />
+</div>
+
+```tsx
+import React, { useEffect } from "react";
+import {
+  PeelWrapper,
+  PeelTop,
+  PeelBack,
+  PeelBottom,
+  usePeel,
+  peelHint,
+} from "react-peel";
+
+function HintExample() {
+  const { peelRef } = usePeel();
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (peelRef.current) {
+        await peelHint(peelRef.current, {
+          peekSize: 40,
+          duration: 400,
+          repeat: 3,
+        });
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [peelRef]);
+
+  return (
+    <PeelWrapper ref={peelRef} height={200} width={200} drag>
+      <PeelTop style={{ backgroundColor: "#81afcb" }} />
+      <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+      <PeelBottom style={{ backgroundColor: "#688394" }} />
+    </PeelWrapper>
+  );
+}
+```
+
+### Looping Animation
+
+Create continuous peel animations:
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <LoopingAnimationDemo />
+</div>
+
+```tsx
+import React, { useEffect, useRef, useState } from "react";
+import {
+  PeelWrapper,
+  PeelTop,
+  PeelBack,
+  PeelBottom,
+  usePeel,
+  loopPeel,
+} from "react-peel";
+
+function LoopingAnimation() {
+  const { peelRef } = usePeel();
+  const stopRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handleToggle = () => {
+    if (isPlaying && stopRef.current) {
+      stopRef.current();
+      stopRef.current = null;
+      setIsPlaying(false);
+    } else if (peelRef.current) {
+      stopRef.current = loopPeel({
+        peel: peelRef.current,
+        path: [200, 200, 100, 0, 0, 100, -200, -200],
+        duration: 2000,
+        easing: "easeInOut",
+        pingPong: true,
+      });
+      setIsPlaying(true);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (stopRef.current) stopRef.current();
+    };
+  }, []);
+
+  return (
+    <div>
+      <button onClick={handleToggle}>
+        {isPlaying ? "Stop" : "Start Loop"}
+      </button>
+      <PeelWrapper ref={peelRef} height={200} width={200}>
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </div>
+  );
+}
+```
+
+---
+
+## Animation Options
+
+### Easing Functions
+
+Available easing functions for animations:
+
+<table>
+  <thead>
+    <tr>
+      <th>Easing</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>linear</td>
+      <td>No easing - constant speed</td>
+    </tr>
+    <tr>
+      <td>easeIn</td>
+      <td>Slow start, fast end</td>
+    </tr>
+    <tr>
+      <td>easeOut</td>
+      <td>Fast start, slow end</td>
+    </tr>
+    <tr>
+      <td>easeInOut</td>
+      <td>Slow start and end</td>
+    </tr>
+    <tr>
+      <td>easeInQuad</td>
+      <td>Quadratic ease in</td>
+    </tr>
+    <tr>
+      <td>easeOutQuad</td>
+      <td>Quadratic ease out</td>
+    </tr>
+    <tr>
+      <td>easeInOutQuad</td>
+      <td>Quadratic ease in/out</td>
+    </tr>
+    <tr>
+      <td>easeInExpo</td>
+      <td>Exponential ease in</td>
+    </tr>
+    <tr>
+      <td>easeOutExpo</td>
+      <td>Exponential ease out</td>
+    </tr>
+    <tr>
+      <td>spring</td>
+      <td>Spring-like bounce</td>
+    </tr>
+    <tr>
+      <td>bounce</td>
+      <td>Bouncy ending</td>
+    </tr>
+    <tr>
+      <td>backOut</td>
+      <td>Slight overshoot</td>
+    </tr>
+  </tbody>
+</table>
+
+### Animation Config
+
+```tsx
+await animate({
+  to: { x: 0, y: 0 }, // Target position
+  from: { x: 200, y: 200 }, // Optional start position
+  duration: 500, // Duration in ms
+  easing: "easeOut", // Easing function
+  onStart: () => {}, // Called when animation starts
+  onEnd: () => {}, // Called when animation ends
+  onProgress: (p) => {}, // Called each frame with progress (0-1)
+});
+```
+
+---
+
+## Real-World Examples
+
+Check out these production-ready implementations:
+
+- [Sticky Note](/examples/sticky-note) - Interactive sticky note with realistic peel
+- [Photo Album](/examples/photo-album) - Book-style photo gallery
+- [Scratch Card](/examples/scratch-card) - Lottery ticket reveal
+- [Product Card](/examples/product-card) - E-commerce discount reveal
+- [Magazine](/examples/magazine) - Multi-page magazine viewer
+- [Calendar](/examples/calendar-flip) - Animated calendar flip
+- [Gift Card](/examples/gift-card) - Gift code reveal
+- [Envelope](/examples/envelope) - Letter envelope opening
+
+---
+
+## Tips & Best Practices
+
+### Performance
+
+- Use `drag` prop for simple interactions instead of custom `handleDrag`
+- Prefer presets over custom options when possible
+- Avoid re-rendering during animations by using refs
+
+### Accessibility
+
+- Provide alternative ways to reveal hidden content
+- Use appropriate ARIA labels for interactive elements
+- Consider users who may not be able to perform drag gestures
+
+### Styling
+
+- Ensure sufficient contrast between layers
+- Test with different content lengths
+- Use consistent shadow settings across your app
+
+### Common Issues
+
+<table>
+  <thead>
+    <tr>
+      <th>Issue</th>
+      <th>Solution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Peel not visible</td>
+      <td>
+        Check <code>height</code> and <code>width</code> props are set
+      </td>
+    </tr>
+    <tr>
+      <td>Drag not working</td>
+      <td>
+        Ensure <code>drag</code> prop is <code>true</code> and{" "}
+        <code>disabled</code> is not set
+      </td>
+    </tr>
+    <tr>
+      <td>Animation choppy</td>
+      <td>Reduce animation duration or simplify content</td>
+    </tr>
+    <tr>
+      <td>Wrong corner</td>
+      <td>
+        Set <code>corner</code> prop explicitly
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -1,248 +1,84 @@
 # Gift Card
 
-An animated gift card with dramatic reveal effect. Perfect for e-gift cards, rewards, or special occasions.
+Reveal a code with a dramatic peel and a call to action.
 
-## Preview
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
-A gift card that users can peel to reveal a hidden code with celebration animation.
+## Live Demo
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper preset="giftCard" width={320} height={200} drag>
+    <PeelTop
+      style={{
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        color: "#fff",
+        padding: 20,
+      }}
+    >
+      <div style={{ fontSize: 14, opacity: 0.8 }}>GIFT CARD</div>
+      <div style={{ fontSize: 36, fontWeight: "bold", marginTop: 8 }}>$50</div>
+      <div style={{ marginTop: 12, fontSize: 14 }}>Peel to reveal code</div>
+    </PeelTop>
+    <PeelBack style={{ background: "#5e60ce" }} />
+    <PeelBottom
+      style={{
+        background: "#fff9c4",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div style={{ fontSize: 12, color: "#666" }}>YOUR CODE</div>
+      <div style={{ fontSize: 24, fontWeight: "bold", color: "#5e60ce" }}>GIFT50</div>
+    </PeelBottom>
+  </PeelWrapper>
+</div>
 
 ## Implementation
 
 ```tsx
 import React, { useState } from "react";
-import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
 interface GiftCardProps {
   amount: number;
   code: string;
-  fromName?: string;
-  message?: string;
-  onReveal?: (code: string) => void;
 }
 
-export function GiftCard({
-  amount,
-  code,
-  fromName = "Someone special",
-  message = "Enjoy your gift!",
-  onReveal,
-}: GiftCardProps) {
-  const { peelRef, animate } = usePeel();
+export function GiftCard({ amount, code }: GiftCardProps) {
   const [revealed, setRevealed] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  const handleRevealClick = async () => {
-    if (revealed) return;
-
-    await animate({
-      to: { x: -50, y: -30 },
-      duration: 1000,
-      easing: "spring",
-      onProgress: (progress) => {
-        if (progress > 0.7 && !revealed) {
-          setRevealed(true);
-          setShowConfetti(true);
-          onReveal?.(code);
-          setTimeout(() => setShowConfetti(false), 3000);
-        }
-      },
-    });
-  };
 
   return (
-    <div style={{ position: "relative" }}>
-      {/* Confetti animation */}
-      {showConfetti && <Confetti />}
-
-      <div
-        style={{
-          width: 360,
-          borderRadius: "16px",
-          overflow: "hidden",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-        }}
-      >
-        <PeelWrapper
-          ref={peelRef}
-          preset="giftCard"
-          width={360}
-          height={220}
-          drag
-          onPeelProgress={(progress) => {
-            if (progress > 0.6 && !revealed) {
-              setRevealed(true);
-              setShowConfetti(true);
-              onReveal?.(code);
-              setTimeout(() => setShowConfetti(false), 3000);
-            }
-          }}
-        >
-          <PeelTop
-            style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              padding: "24px",
-              color: "#fff",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <div style={{ fontSize: "14px", opacity: 0.8 }}>GIFT CARD</div>
-            <div style={{ fontSize: "48px", fontWeight: "bold", marginTop: "8px" }}>
-              ${amount}
-            </div>
-            <div style={{ marginTop: "auto" }}>
-              <div style={{ fontSize: "14px", opacity: 0.8 }}>From</div>
-              <div style={{ fontSize: "18px" }}>{fromName}</div>
-            </div>
-            {!revealed && (
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 16,
-                  right: 16,
-                  fontSize: "12px",
-                  opacity: 0.7,
-                }}
-              >
-                Peel to reveal code →
-              </div>
-            )}
-          </PeelTop>
-          <PeelBack
-            style={{
-              background: "linear-gradient(135deg, #764ba2 0%, #667eea 100%)",
-            }}
-          />
-          <PeelBottom
-            style={{
-              background: "#fff",
-              padding: "24px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <div style={{ fontSize: "14px", color: "#666", marginBottom: "8px" }}>
-              YOUR GIFT CODE
-            </div>
-            <div
-              style={{
-                fontSize: "28px",
-                fontWeight: "bold",
-                letterSpacing: "4px",
-                color: "#764ba2",
-                padding: "12px 24px",
-                background: "#f5f5f5",
-                borderRadius: "8px",
-              }}
-            >
-              {code}
-            </div>
-            <div
-              style={{
-                marginTop: "16px",
-                fontSize: "16px",
-                color: "#333",
-                textAlign: "center",
-              }}
-            >
-              {message}
-            </div>
-          </PeelBottom>
-        </PeelWrapper>
-      </div>
-
-      {/* Reveal button */}
-      {!revealed && (
-        <button
-          onClick={handleRevealClick}
-          style={{
-            display: "block",
-            width: "100%",
-            maxWidth: 360,
-            marginTop: "16px",
-            padding: "16px",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "18px",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          🎁 Open Gift Card
-        </button>
-      )}
-
-      {/* Copy button */}
-      {revealed && (
-        <button
-          onClick={() => navigator.clipboard.writeText(code)}
-          style={{
-            display: "block",
-            width: "100%",
-            maxWidth: 360,
-            marginTop: "16px",
-            padding: "16px",
-            background: "#4caf50",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "18px",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          📋 Copy Code
-        </button>
-      )}
-    </div>
-  );
-}
-
-// Simple confetti component
-function Confetti() {
-  const colors = ["#667eea", "#764ba2", "#ff6b6b", "#feca57", "#48dbfb"];
-  
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: "none",
-        overflow: "hidden",
-        zIndex: 10,
+    <PeelWrapper
+      preset="giftCard"
+      width={320}
+      height={200}
+      drag
+      onPeelProgress={(progress) => {
+        if (!revealed && progress > 0.6) setRevealed(true);
       }}
     >
-      {Array(30)
-        .fill(null)
-        .map((_, i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              width: "10px",
-              height: "10px",
-              background: colors[i % colors.length],
-              left: `${Math.random() * 100}%`,
-              animation: `confetti-fall 3s ease-out forwards`,
-              animationDelay: `${Math.random() * 0.5}s`,
-              transform: `rotate(${Math.random() * 360}deg)`,
-            }}
-          />
-        ))}
-      <style>{`
-        @keyframes confetti-fall {
-          0% { top: -10%; opacity: 1; }
-          100% { top: 100%; opacity: 0; transform: rotate(720deg); }
-        }
-      `}</style>
-    </div>
+      <PeelTop style={{ background: "#667eea", color: "#fff", padding: 20 }}>
+        <div style={{ fontSize: 14 }}>GIFT CARD</div>
+        <div style={{ fontSize: 36, fontWeight: "bold" }}>${amount}</div>
+        <div style={{ marginTop: 12 }}>Peel to reveal</div>
+      </PeelTop>
+      <PeelBack style={{ background: "#5e60ce" }} />
+      <PeelBottom
+        style={{
+          background: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 22,
+          fontWeight: "bold",
+          color: "#5e60ce",
+        }}
+      >
+        {revealed ? code : ""}
+      </PeelBottom>
+    </PeelWrapper>
   );
 }
 ```
@@ -250,11 +86,5 @@ function Confetti() {
 ## Usage
 
 ```tsx
-<GiftCard
-  amount={50}
-  code="GIFT-ABC123"
-  fromName="John Doe"
-  message="Happy Birthday! 🎂"
-  onReveal={(code) => console.log("Revealed:", code)}
-/>
+<GiftCard amount={50} code="GIFT50" />
 ```

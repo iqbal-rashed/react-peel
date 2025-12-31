@@ -1,94 +1,93 @@
 # Getting Started
 
-Welcome to React Peel! This guide will help you get started with creating beautiful peel effects in your React applications.
+React Peel gives you a simple set of components and hooks for peel effects. Start with the core layers, then add presets or programmatic control as needed.
 
 ## Installation
 
-Install react-peel using your preferred package manager:
-
-import { Tabs, Tab } from 'rspress/theme';
+import { Tabs, Tab } from "rspress/theme";
 
 <Tabs>
   <Tab label="npm">
-    ```bash
-    npm install react-peel
-    ```
+  ```bash
+  npm install react-peel
+  ```
   </Tab>
   <Tab label="pnpm">
-    ```bash
-    pnpm add react-peel
-    ```
+  ```bash
+  pnpm add react-peel
+  ```
   </Tab>
   <Tab label="yarn">
-    ```bash
-    yarn add react-peel
-    ```
+  ```bash
+  yarn add react-peel
+  ```
   </Tab>
   <Tab label="bun">
-    ```bash
-    bun add react-peel
-    ```
+  ```bash
+  bun add react-peel
+  ```
   </Tab>
 </Tabs>
 
-## Quick Start
+## Basic Setup
 
-The simplest way to create a peel effect:
+A peel effect is a container with three layers:
+
+- `PeelTop` is the layer that peels back.
+- `PeelBack` is the underside of the peeled layer.
+- `PeelBottom` is the content revealed underneath.
 
 ```tsx
 import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
-function MyComponent() {
+function SimplePeel() {
   return (
     <PeelWrapper height={200} width={200} drag>
       <PeelTop style={{ backgroundColor: "#81afcb" }} />
       <PeelBack style={{ backgroundColor: "#a0c7df" }} />
-      <PeelBottom style={{ backgroundColor: "#688394" }} />
-    </PeelWrapper>
-  );
-}
-```
-
-This creates a 200x200 pixel element with three layers:
-- **PeelTop**: The top layer that gets peeled back
-- **PeelBack**: The back side of the peeled layer
-- **PeelBottom**: The content revealed underneath
-
-The `drag` prop enables mouse/touch interaction.
-
-## Using Presets
-
-React Peel comes with pre-built presets for common use cases:
-
-```tsx
-import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
-
-// Sticky note effect
-function StickyNote() {
-  return (
-    <PeelWrapper height={200} width={200} preset="stickyNote" drag>
-      <PeelTop style={{ backgroundColor: "#fff9c4" }}>
-        <p>Note content</p>
-      </PeelTop>
-      <PeelBack style={{ backgroundColor: "#fff59d" }} />
-      <PeelBottom style={{ backgroundColor: "#f5f5f5" }}>
-        <p>Hidden message!</p>
+      <PeelBottom style={{ backgroundColor: "#688394" }}>
+        Hidden content
       </PeelBottom>
     </PeelWrapper>
   );
 }
 ```
 
-Available presets: `stickyNote`, `pageFlip`, `revealCard`, `calendar`, `envelope`, `giftCard`, `photoAlbum`, `scratchCard`
+React Peel injects a small global style block that sets the peel container to `position: relative` and applies a few classes used by the effect. You can override those styles with your own CSS.
 
-## Using the usePeel Hook
+## Presets
 
-For programmatic control over peel animations:
+Presets provide a curated set of options and defaults:
+
+| Preset | Best for |
+| --- | --- |
+| `stickyNote` | Sticky notes and reminders |
+| `pageFlip` | Book or magazine page turns |
+| `revealCard` | Reveal cards and product promos |
+| `calendar` | Calendar flips |
+| `envelope` | Envelope flap open |
+| `giftCard` | Dramatic reveal with reflections |
+| `photoAlbum` | Photo albums |
+| `scratchCard` | Scratch-off reveals |
+
+```tsx
+<PeelWrapper preset="stickyNote" height={150} width={150} drag>
+  <PeelTop style={{ backgroundColor: "#fff9c4", padding: 16 }}>
+    Reminder
+  </PeelTop>
+  <PeelBack style={{ backgroundColor: "#fff59d" }} />
+  <PeelBottom style={{ backgroundColor: "#f5f5f5" }} />
+</PeelWrapper>
+```
+
+## Programmatic Control
+
+Use the `usePeel` hook to animate the peel position or read progress:
 
 ```tsx
 import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
 
-function RevealButton() {
+function RevealCard() {
   const { peelRef, animate, reset } = usePeel();
 
   const handleReveal = async () => {
@@ -103,12 +102,12 @@ function RevealButton() {
     <>
       <button onClick={handleReveal}>Reveal</button>
       <button onClick={reset}>Reset</button>
-      
+
       <PeelWrapper ref={peelRef} height={200} width={200}>
         <PeelTop style={{ backgroundColor: "#e3f2fd" }} />
         <PeelBack style={{ backgroundColor: "#bbdefb" }} />
         <PeelBottom style={{ backgroundColor: "#90caf9" }}>
-          <p>🎉 Surprise!</p>
+          Surprise
         </PeelBottom>
       </PeelWrapper>
     </>
@@ -116,47 +115,25 @@ function RevealButton() {
 }
 ```
 
-## TypeScript Support
+## Configuration Basics
 
-React Peel is fully typed. Import types as needed:
+- Use `corner` to choose the peel corner (`"TOP_LEFT"`, `"TOP_RIGHT"`, `"BOTTOM_LEFT"`, `"BOTTOM_RIGHT"`) or a custom `{ x, y }` coordinate.
+- Use `constraints` to restrict how far the peel can move (single value or array).
+- Use `peelPath` and `timeAlongPath` to control motion along a line or bezier curve.
+- Use `options` for advanced shadow and reflection tuning.
 
-```tsx
-import type { 
-  PeelWrapperProps, 
-  PeelRef, 
-  PresetName,
-  PeelOptions 
-} from "react-peel";
-```
+## Framework Notes
 
-## Framework Integration
-
-### Next.js
-
-React Peel works out of the box with Next.js. Since it uses DOM APIs, ensure components are client-side rendered:
+React Peel uses DOM APIs. For SSR frameworks like Next.js, render on the client:
 
 ```tsx
 "use client";
 
 import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
-
-export default function PeelComponent() {
-  return (
-    <PeelWrapper height={200} width={200} drag>
-      <PeelTop />
-      <PeelBack />
-      <PeelBottom />
-    </PeelWrapper>
-  );
-}
 ```
-
-### Vite / Create React App
-
-No special configuration needed. Just install and import!
 
 ## Next Steps
 
-- [API Reference](/guide/api) - Complete API documentation
-- [Examples](/guide/examples) - Interactive examples with code
-- [Real-World Examples](/examples/sticky-note) - Production-ready implementations
+- [Components API](/api/components)
+- [Hooks and Animations](/api/hooks)
+- [Examples](/examples/sticky-note)

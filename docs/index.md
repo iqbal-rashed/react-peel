@@ -3,8 +3,9 @@ pageType: home
 
 hero:
   name: React Peel
-  text: Create Realistic Peeling Effects
-  tagline: A powerful React library for beautiful page peel, page flip, scratch card, and reveal animations
+  text: Realistic peel effects for React
+  tagline: Create stunning page peel, page flip, scratch card, and reveal effects with a lightweight, fully-typed API.
+  textAlign: left
   image:
     src: /logo.png
     alt: React Peel
@@ -13,20 +14,29 @@ hero:
       text: Get Started
       link: /guide/getting-started
     - theme: alt
-      text: View on GitHub
+      text: Examples
+      link: /examples/sticky-note
+    - theme: alt
+      text: GitHub
       link: https://github.com/iqbal-rashed/react-peel
 
 features:
-  - title: 🎨 Pre-built Presets
-    details: Ready-to-use effects including sticky notes, page flips, scratch cards, calendars, and more.
-  - title: 🎣 React Hooks
-    details: Use the usePeel hook for complete programmatic control over your peel animations.
-  - title: ⚡ Zero Dependencies
-    details: Lightweight bundle with no external runtime dependencies - just React.
-  - title: 🎬 Smooth Animations
-    details: Built-in easing functions and animation utilities for professional-quality effects.
-  - title: 📦 TypeScript Ready
-    details: Full TypeScript support with comprehensive type definitions.
-  - title: 🎯 Easy to Use
-    details: Simple API with sensible defaults - get started in minutes.
+  - title: 🎨 Ready-to-Use Presets
+    details: Jumpstart your project with built-in presets for sticky notes, page flips, calendars, scratch cards, gift cards, envelopes, and more.
+    icon: 🎨
+  - title: 🔗 Hook-Based Control
+    details: Use the usePeel hook for full programmatic control — animate, query progress, reset, and chain complex sequences with async/await.
+    icon: 🔗
+  - title: ⚡ Smooth Animations
+    details: Built-in easing functions (ease, spring, bounce) and animation helpers for buttery-smooth motion and professional results.
+    icon: ⚡
+  - title: 🎯 Flexible Interactions
+    details: Draggable peels, click handlers, constraints, and custom drag behaviors. Full control over user interactions.
+    icon: 🎯
+  - title: 📦 TypeScript First
+    details: Complete TypeScript definitions for components, options, callbacks, and animation utilities. Excellent IDE support.
+    icon: 📦
+  - title: 🎭 Rich Effects
+    details: Shadows, reflections, fade-outs, and shiny back layers. Fine-tune every visual detail to match your design.
+    icon: 🎭
 ---

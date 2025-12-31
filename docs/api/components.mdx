@@ -1,0 +1,147 @@
+# Components API
+
+This page documents the React components and the core configuration options.
+
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
+
+## PeelWrapper
+
+`PeelWrapper` creates the peel container and wires up peel.js.
+
+```tsx
+<PeelWrapper height={200} width={200} drag>
+  <PeelTop />
+  <PeelBack />
+  <PeelBottom />
+</PeelWrapper>
+```
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `ref` | `RefObject<PeelRef>` | - | Ref to the peel.js instance. |
+| `className` | `string` | - | CSS class for the container. |
+| `height` | `string \| number` | `"100%"` | Container height. |
+| `width` | `string \| number` | `"100%"` | Container width. |
+| `containerProps` | `HtmlDivProps` | - | Extra props for the container div (style is merged last). |
+| `options` | `PeelOptions` | `{}` | Advanced peel.js options. |
+| `preset` | `PresetName` | - | Apply a preset configuration. |
+| `corner` | `CornerValue` | `"BOTTOM_RIGHT"` | Corner to peel from, or a `{ x, y }` point. |
+| `peelPosition` | `TCoords` | - | Set the peel position directly. |
+| `constraints` | `ConstraintValue` | - | Restrict the peel range. |
+| `mode` | `"book" \| "calendar"` | - | Predefined constraint modes. |
+| `drag` | `boolean` | `false` | Enable drag interaction. |
+| `disabled` | `boolean` | `false` | Disable interactions and pointer events. |
+| `fadeThreshold` | `number` | - | Fade out top layers past this clipped ratio. |
+| `peelPath` | `number[]` | - | Path for line (4 values) or bezier (8 values). |
+| `timeAlongPath` | `number` | - | Position along the path (0 to 1). |
+| `handleDrag` | `(event, x, y, peel) => void` | - | Custom drag handler. |
+| `handlePress` | `(event, peel) => void` | - | Custom press handler. |
+| `onPeelStart` | `(peel) => void` | - | Called when peeling starts. |
+| `onPeelEnd` | `(peel) => void` | - | Called when peeling ends. |
+| `onPeelProgress` | `(progress, peel) => void` | - | Progress callback (0 to 1). |
+
+Notes:
+
+- `preset` merges its `options` with your `options` prop, and applies default `corner` and `mode` unless you override them.
+- `options.corner` is ignored by design. Use the `corner` prop instead.
+
+## Layer Components
+
+These map directly to peel.js layers and accept standard `div` props.
+
+```tsx
+<PeelTop>Front</PeelTop>
+<PeelBack>Back</PeelBack>
+<PeelBottom>Behind</PeelBottom>
+```
+
+## Presets
+
+```tsx
+<PeelWrapper preset="stickyNote" />
+```
+
+Available preset names:
+`stickyNote`, `pageFlip`, `revealCard`, `calendar`, `envelope`, `giftCard`, `photoAlbum`, `scratchCard`
+
+## PeelOptions
+
+`PeelOptions` controls shadow, reflection, and behavior. These map directly to peel.js defaults.
+
+### Top Shadow
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `topShadow` | `boolean` | `true` | Enable the top layer shadow. |
+| `topShadowBlur` | `number` | `5` | Shadow blur radius. |
+| `topShadowAlpha` | `number` | `0.5` | Shadow opacity. |
+| `topShadowOffsetX` | `number` | `0` | Shadow X offset. |
+| `topShadowOffsetY` | `number` | `1` | Shadow Y offset. |
+| `topShadowCreatesShape` | `boolean` | `true` | Use top shadow as shape clip when using SVG shapes. |
+
+### Back Reflection
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `backReflection` | `boolean` | `false` | Enable reflection on the back layer. |
+| `backReflectionSize` | `number` | `0.02` | Reflection size. |
+| `backReflectionOffset` | `number` | `0` | Reflection offset. |
+| `backReflectionAlpha` | `number` | `0.15` | Reflection opacity. |
+| `backReflectionDistribute` | `boolean` | `true` | Distribute reflection along the peel. |
+
+### Back Shadow
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `backShadow` | `boolean` | `true` | Enable back shadow. |
+| `backShadowSize` | `number` | `0.04` | Shadow size. |
+| `backShadowOffset` | `number` | `0` | Shadow offset. |
+| `backShadowAlpha` | `number` | `0.1` | Shadow opacity. |
+| `backShadowDistribute` | `boolean` | `true` | Distribute back shadow. |
+
+### Bottom Shadow
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `bottomShadow` | `boolean` | `true` | Enable bottom shadow. |
+| `bottomShadowSize` | `number` | `1.5` | Shadow size. |
+| `bottomShadowOffset` | `number` | `0` | Shadow offset. |
+| `bottomShadowDarkAlpha` | `number` | `0.7` | Dark shadow opacity. |
+| `bottomShadowLightAlpha` | `number` | `0.1` | Light shadow opacity. |
+| `bottomShadowDistribute` | `boolean` | `true` | Distribute bottom shadow. |
+
+### Behavior and Shapes
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mode` | `"book" \| "calendar"` | - | Mode applied by peel.js during initialization. |
+| `setPeelOnInit` | `boolean` | `true` | Set peel position on init. |
+| `clippingBoxScale` | `number` | `4` | Scale for the clipping box. |
+| `flipConstraintOffset` | `number` | `5` | Offset used to stabilize flip constraints. |
+| `dragPreventsDefault` | `boolean` | `true` | Prevent default on drag events. |
+| `shape` | `SvgElementProps` | - | SVG shape used for clipping. |
+
+## PeelRef
+
+Key instance methods exposed by the ref:
+
+- `setPeelPosition(x, y)`
+- `setCorner(...)`
+- `addPeelConstraint(...)`
+- `setMode(mode)`
+- `setFadeThreshold(value)`
+- `setPeelPath(...points)`
+- `setTimeAlongPath(value)`
+- `getAmountClipped()`
+- `removeEvents()`
+- `clear()`
+
+## Constants
+
+`PeelCorners` is re-exported for convenience:
+
+```tsx
+import { PeelCorners } from "react-peel";
+```

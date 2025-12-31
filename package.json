@@ -8,7 +8,8 @@
     "dev:docs": "rspress dev",
     "build:docs": "rspress build",
     "preview:docs": "rspress preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "dist"

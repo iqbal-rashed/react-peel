@@ -1,237 +1,95 @@
 # Envelope
 
-An envelope opening animation with letter reveal. Perfect for email interfaces, invitations, or message notifications.
+Use a constrained peel to simulate opening an envelope flap.
 
-## Preview
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
-An envelope that opens to reveal a letter inside with smooth animation.
+## Live Demo
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper
+    preset="envelope"
+    width={280}
+    height={180}
+    corner="TOP_RIGHT"
+    constraints={["TOP_LEFT"]}
+    drag
+  >
+    <PeelTop
+      style={{
+        background: "#e8d5b7",
+        clipPath: "polygon(0 0, 50% 60%, 100% 0)",
+        borderBottom: "2px solid #d4c4a8",
+      }}
+    />
+    <PeelBack
+      style={{
+        background: "#f5e6d3",
+        clipPath: "polygon(0 0, 50% 60%, 100% 0)",
+      }}
+    />
+    <PeelBottom
+      style={{
+        background: "#e8d5b7",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+      }}
+    >
+      <div style={{ background: "#fff", padding: 12, width: "90%" }}>
+        Open the envelope to read
+      </div>
+    </PeelBottom>
+  </PeelWrapper>
+</div>
 
 ## Implementation
 
 ```tsx
-import React, { useState } from "react";
-import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
 interface EnvelopeProps {
-  subject: string;
   message: string;
-  sender: string;
-  date?: string;
-  onOpen?: () => void;
 }
 
-export function Envelope({
-  subject,
-  message,
-  sender,
-  date = new Date().toLocaleDateString(),
-  onOpen,
-}: EnvelopeProps) {
-  const { peelRef, animate, reset } = usePeel();
-  const [isOpen, setIsOpen] = useState(false);
-
-  const handleOpen = async () => {
-    if (isOpen) return;
-
-    await animate({
-      to: { x: 150, y: -50 },
-      duration: 600,
-      easing: "easeOut",
-    });
-
-    setIsOpen(true);
-    onOpen?.();
-  };
-
-  const handleClose = async () => {
-    reset();
-    setIsOpen(false);
-  };
-
+export function Envelope({ message }: EnvelopeProps) {
   return (
-    <div
-      style={{
-        width: 320,
-        perspective: "1000px",
-      }}
+    <PeelWrapper
+      preset="envelope"
+      width={320}
+      height={200}
+      corner="TOP_RIGHT"
+      constraints={["TOP_LEFT"]}
+      drag
     >
-      {/* Envelope */}
-      <PeelWrapper
-        ref={peelRef}
-        preset="envelope"
-        width={320}
-        height={200}
-        corner="TOP_RIGHT"
-        constraints={["TOP_LEFT"]}
-        drag
-        onPeelProgress={(progress) => {
-          if (progress > 0.5 && !isOpen) {
-            setIsOpen(true);
-            onOpen?.();
-          }
-        }}
-      >
-        {/* Flap */}
-        <PeelTop
-          style={{
-            background: "#e8d5b7",
-            clipPath: "polygon(0 0, 50% 60%, 100% 0)",
-            borderBottom: "2px solid #d4c4a8",
-          }}
-        />
-        <PeelBack
-          style={{
-            background: "#f5e6d3",
-            clipPath: "polygon(0 0, 50% 60%, 100% 0)",
-          }}
-        />
-        {/* Envelope body with letter preview */}
-        <PeelBottom
-          style={{
-            background: "#e8d5b7",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "20px",
-          }}
-        >
-          {/* Letter inside */}
-          <div
-            style={{
-              width: "90%",
-              height: "80%",
-              background: "#fff",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              padding: "16px",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "10px",
-                color: "#999",
-                marginBottom: "8px",
-              }}
-            >
-              {date}
-            </div>
-            <div
-              style={{
-                fontSize: "14px",
-                fontWeight: "bold",
-                marginBottom: "8px",
-                color: "#333",
-              }}
-            >
-              {subject}
-            </div>
-            <div
-              style={{
-                fontSize: "12px",
-                color: "#666",
-                lineHeight: 1.4,
-              }}
-            >
-              {message.substring(0, 80)}...
-            </div>
-          </div>
-        </PeelBottom>
-      </PeelWrapper>
-
-      {/* Envelope base */}
-      <div
+      <PeelTop
         style={{
-          marginTop: "-100px",
-          width: 320,
-          height: 100,
           background: "#e8d5b7",
-          borderBottomLeftRadius: "8px",
-          borderBottomRightRadius: "8px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          clipPath: "polygon(0 0, 50% 60%, 100% 0)",
+          borderBottom: "2px solid #d4c4a8",
         }}
       />
-
-      {/* Full letter view when open */}
-      {isOpen && (
-        <div
-          style={{
-            marginTop: "20px",
-            background: "#fff",
-            padding: "24px",
-            borderRadius: "8px",
-            boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-            animation: "slideUp 0.3s ease-out",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginBottom: "16px",
-              paddingBottom: "16px",
-              borderBottom: "1px solid #eee",
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: "bold", color: "#333" }}>{sender}</div>
-              <div style={{ fontSize: "14px", color: "#666" }}>{subject}</div>
-            </div>
-            <div style={{ fontSize: "14px", color: "#999" }}>{date}</div>
-          </div>
-          <div
-            style={{
-              fontSize: "16px",
-              lineHeight: 1.6,
-              color: "#333",
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            {message}
-          </div>
-          <button
-            onClick={handleClose}
-            style={{
-              marginTop: "20px",
-              padding: "12px 24px",
-              background: "#f5f5f5",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-          >
-            Close Letter
-          </button>
+      <PeelBack
+        style={{
+          background: "#f5e6d3",
+          clipPath: "polygon(0 0, 50% 60%, 100% 0)",
+        }}
+      />
+      <PeelBottom
+        style={{
+          background: "#e8d5b7",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: 20,
+        }}
+      >
+        <div style={{ background: "#fff", padding: 16, width: "90%" }}>
+          {message}
         </div>
-      )}
-
-      {/* Open button */}
-      {!isOpen && (
-        <button
-          onClick={handleOpen}
-          style={{
-            display: "block",
-            width: "100%",
-            marginTop: "16px",
-            padding: "12px",
-            background: "#8b7355",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "16px",
-            cursor: "pointer",
-          }}
-        >
-          ✉️ Open Envelope
-        </button>
-      )}
-
-      <style>{`
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-    </div>
+      </PeelBottom>
+    </PeelWrapper>
   );
 }
 ```
@@ -239,50 +97,5 @@ export function Envelope({
 ## Usage
 
 ```tsx
-<Envelope
-  subject="You're Invited! 🎉"
-  sender="Party Planning Committee"
-  message={`Dear Friend,
-
-You are cordially invited to our annual celebration!
-
-Date: December 31st, 2024
-Time: 8:00 PM
-Location: Grand Ballroom
-
-Please RSVP by December 25th.
-
-We look forward to seeing you there!
-
-Best regards,
-The Party Committee`}
-  onOpen={() => console.log("Envelope opened!")}
-/>
-```
-
-## Inbox Example
-
-```tsx
-function Inbox() {
-  const emails = [
-    {
-      subject: "Welcome to the team!",
-      sender: "HR Department",
-      message: "We're excited to have you join us...",
-    },
-    {
-      subject: "Meeting Tomorrow",
-      sender: "John Smith",
-      message: "Hi, just a reminder about our meeting...",
-    },
-  ];
-
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      {emails.map((email, i) => (
-        <Envelope key={i} {...email} />
-      ))}
-    </div>
-  );
-}
+<Envelope message="You are invited to the event." />
 ```

@@ -1,10 +1,24 @@
 # Magazine
 
-A multi-page magazine viewer with realistic page flip. Perfect for digital publications, lookbooks, or catalogs.
+Create a page flip experience for editorial content.
 
-## Preview
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
-A magazine that users can flip through with smooth page-turning animations.
+## Live Demo
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper preset="pageFlip" width={240} height={320} drag>
+    <PeelTop style={{ background: "#fff9c4", padding: 16 }}>
+      <h3 style={{ margin: 0 }}>Feature Story</h3>
+      <p style={{ margin: "8px 0 0" }}>Peel the corner to turn the page.</p>
+    </PeelTop>
+    <PeelBack style={{ background: "#f5f5f5" }} />
+    <PeelBottom style={{ background: "#fafafa", padding: 16 }}>
+      <h3 style={{ margin: 0 }}>Next Page</h3>
+      <p style={{ margin: "8px 0 0" }}>More content here.</p>
+    </PeelBottom>
+  </PeelWrapper>
+</div>
 
 ## Implementation
 
@@ -12,193 +26,37 @@ A magazine that users can flip through with smooth page-turning animations.
 import React, { useState } from "react";
 import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
 
-interface MagazinePage {
-  content: React.ReactNode;
-  background?: string;
-}
-
 interface MagazineProps {
-  pages: MagazinePage[];
-  width?: number;
-  height?: number;
-  title?: string;
+  pages: React.ReactNode[];
 }
 
-export function Magazine({
-  pages,
-  width = 300,
-  height = 420,
-  title = "Magazine",
-}: MagazineProps) {
-  const [currentPage, setCurrentPage] = useState(0);
-  const { peelRef, animate, reset } = usePeel();
-  const [isAnimating, setIsAnimating] = useState(false);
+export function Magazine({ pages }: MagazineProps) {
+  const [index, setIndex] = useState(0);
+  const { peelRef, reset } = usePeel();
 
-  const goToNext = async () => {
-    if (currentPage >= pages.length - 1 || isAnimating) return;
-    setIsAnimating(true);
-
-    await animate({
-      to: { x: -width * 0.6, y: height * 0.5 },
-      duration: 500,
-      easing: "easeInOut",
-    });
-
-    setCurrentPage((p) => p + 1);
-    reset();
-    setIsAnimating(false);
-  };
-
-  const goToPrev = () => {
-    if (currentPage <= 0 || isAnimating) return;
-    setCurrentPage((p) => p - 1);
-    reset();
-  };
-
-  const currentContent = pages[currentPage];
-  const nextContent = pages[currentPage + 1];
+  const current = pages[index];
+  const next = pages[index + 1];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      {/* Magazine spread */}
-      <div
-        style={{
-          display: "flex",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-          borderRadius: "4px",
-          overflow: "hidden",
-        }}
-      >
-        {/* Left page (previous content) */}
-        <div
-          style={{
-            width,
-            height,
-            background: currentPage > 0 ? pages[currentPage - 1]?.background || "#fff" : "#f0f0f0",
-            borderRight: "2px solid #ddd",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          {currentPage > 0 ? (
-            pages[currentPage - 1]?.content
-          ) : (
-            <div style={{ color: "#999", textAlign: "center" }}>
-              <div style={{ fontSize: "24px", marginBottom: "8px" }}>📖</div>
-              <div>{title}</div>
-            </div>
-          )}
-        </div>
-
-        {/* Right page with peel effect */}
-        <PeelWrapper
-          ref={peelRef}
-          preset="pageFlip"
-          width={width}
-          height={height}
-          drag={currentPage < pages.length - 1}
-          disabled={isAnimating}
-          onPeelProgress={(progress) => {
-            if (progress > 0.6 && currentPage < pages.length - 1 && !isAnimating) {
-              setIsAnimating(true);
-              setCurrentPage((p) => p + 1);
-              reset();
-              setTimeout(() => setIsAnimating(false), 100);
-            }
-          }}
-        >
-          <PeelTop
-            style={{
-              background: currentContent?.background || "#fff",
-              padding: "24px",
-              overflow: "hidden",
-            }}
-          >
-            {currentContent?.content}
-          </PeelTop>
-          <PeelBack
-            style={{
-              background: currentContent?.background || "#fff",
-              filter: "brightness(0.95)",
-            }}
-          />
-          <PeelBottom
-            style={{
-              background: nextContent?.background || "#f5f5f5",
-              padding: "24px",
-            }}
-          >
-            {nextContent?.content || (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "100%",
-                  color: "#666",
-                }}
-              >
-                The End
-              </div>
-            )}
-          </PeelBottom>
-        </PeelWrapper>
-      </div>
-
-      {/* Navigation */}
-      <div
-        style={{
-          marginTop: "20px",
-          display: "flex",
-          alignItems: "center",
-          gap: "20px",
-        }}
-      >
-        <button
-          onClick={goToPrev}
-          disabled={currentPage === 0 || isAnimating}
-          style={{
-            padding: "10px 20px",
-            cursor: currentPage === 0 ? "not-allowed" : "pointer",
-            opacity: currentPage === 0 ? 0.5 : 1,
-          }}
-        >
-          ← Previous
-        </button>
-        
-        {/* Page indicators */}
-        <div style={{ display: "flex", gap: "8px" }}>
-          {pages.map((_, i) => (
-            <div
-              key={i}
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                background: i === currentPage ? "#333" : "#ccc",
-                cursor: "pointer",
-              }}
-              onClick={() => {
-                if (!isAnimating) setCurrentPage(i);
-              }}
-            />
-          ))}
-        </div>
-
-        <button
-          onClick={goToNext}
-          disabled={currentPage >= pages.length - 1 || isAnimating}
-          style={{
-            padding: "10px 20px",
-            cursor: currentPage >= pages.length - 1 ? "not-allowed" : "pointer",
-            opacity: currentPage >= pages.length - 1 ? 0.5 : 1,
-          }}
-        >
-          Next →
-        </button>
-      </div>
-    </div>
+    <PeelWrapper
+      ref={peelRef}
+      preset="pageFlip"
+      width={260}
+      height={340}
+      drag
+      onPeelProgress={(progress) => {
+        if (progress > 0.6 && index < pages.length - 1) {
+          setIndex((i) => i + 1);
+          reset();
+        }
+      }}
+    >
+      <PeelTop style={{ background: "#fff", padding: 16 }}>{current}</PeelTop>
+      <PeelBack style={{ background: "#f5f5f5" }} />
+      <PeelBottom style={{ background: "#fafafa", padding: 16 }}>
+        {next || "End of issue"}
+      </PeelBottom>
+    </PeelWrapper>
   );
 }
 ```
@@ -206,33 +64,11 @@ export function Magazine({
 ## Usage
 
 ```tsx
-const magazinePages = [
-  {
-    content: (
-      <div style={{ textAlign: "center" }}>
-        <h1>Welcome to Our Magazine</h1>
-        <p>Issue #42 • December 2024</p>
-      </div>
-    ),
-    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-  },
-  {
-    content: (
-      <article>
-        <h2>Feature Article</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit...</p>
-      </article>
-    ),
-  },
-  {
-    content: (
-      <div>
-        <img src="/magazine/spread-1.jpg" style={{ width: "100%" }} />
-        <p>Photo gallery continues...</p>
-      </div>
-    ),
-  },
-];
-
-<Magazine pages={magazinePages} title="Tech Weekly" />
+<Magazine
+  pages={[
+    <div key="one">Cover Story</div>,
+    <div key="two">Feature Article</div>,
+    <div key="three">Photo Spread</div>,
+  ]}
+/>
 ```

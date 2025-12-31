@@ -1,85 +1,72 @@
 # Sticky Note
 
-A realistic sticky note with a peelable corner effect. Perfect for reminders, notifications, or decorative UI elements.
+A small corner curl works well for reminders or in-product tips.
 
-## Preview
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
-A yellow sticky note that users can peel back to reveal a hidden message or simply interact with.
+## Live Demo
+
+<div style={{ padding: "20px", display: "flex", justifyContent: "center" }}>
+  <PeelWrapper preset="stickyNote" height={200} width={200} drag>
+    <PeelTop
+      style={{
+        backgroundColor: "#fff9c4",
+        padding: "16px",
+        fontFamily: "sans-serif",
+                color: "#333",
+      }}
+    >
+      Buy milk
+    </PeelTop>
+    <PeelBack style={{ backgroundColor: "#fff59d" }} />
+    <PeelBottom
+      style={{
+        backgroundColor: "#f5f5f5",
+        padding: "16px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#555",
+        fontStyle: "italic",
+      }}
+    >
+      Hidden note
+    </PeelBottom>
+  </PeelWrapper>
+</div>
 
 ## Implementation
 
 ```tsx
-import React, { useState } from "react";
-import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel, peelHint } from "react-peel";
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom } from "react-peel";
 
 interface StickyNoteProps {
   message: string;
   hiddenMessage?: string;
-  color?: string;
   width?: number;
   height?: number;
-  showHint?: boolean;
 }
 
 export function StickyNote({
   message,
-  hiddenMessage = "You found the secret!",
-  color = "#fff9c4",
+  hiddenMessage = "Hidden note",
   width = 200,
   height = 200,
-  showHint = true,
 }: StickyNoteProps) {
-  const { peelRef } = usePeel();
-  const [hasInteracted, setHasInteracted] = useState(false);
-
-  React.useEffect(() => {
-    if (showHint && peelRef.current && !hasInteracted) {
-      const timer = setTimeout(() => {
-        peelHint(peelRef.current, {
-          peekSize: 25,
-          duration: 300,
-          repeat: 2,
-        });
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [showHint, hasInteracted]);
-
   return (
-    <PeelWrapper
-      ref={peelRef}
-      preset="stickyNote"
-      height={height}
-      width={width}
-      drag
-      onPeelStart={() => setHasInteracted(true)}
-    >
-      <PeelTop
-        style={{
-          backgroundColor: color,
-          padding: "16px",
-          fontFamily: "'Patrick Hand', cursive, sans-serif",
-          fontSize: "16px",
-          lineHeight: 1.5,
-          boxShadow: "2px 2px 5px rgba(0,0,0,0.1)",
-        }}
-      >
+    <PeelWrapper preset="stickyNote" height={height} width={width} drag>
+      <PeelTop style={{ backgroundColor: "#fff9c4", padding: 16 }}>
         {message}
       </PeelTop>
-      <PeelBack
-        style={{
-          backgroundColor: adjustColor(color, -10),
-        }}
-      />
+      <PeelBack style={{ backgroundColor: "#fff59d" }} />
       <PeelBottom
         style={{
           backgroundColor: "#f5f5f5",
-          padding: "16px",
+          padding: 16,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           fontStyle: "italic",
-          color: "#666",
         }}
       >
         {hiddenMessage}
@@ -87,95 +74,16 @@ export function StickyNote({
     </PeelWrapper>
   );
 }
-
-// Helper to darken/lighten colors
-function adjustColor(color: string, amount: number): string {
-  const hex = color.replace("#", "");
-  const num = parseInt(hex, 16);
-  const r = Math.min(255, Math.max(0, (num >> 16) + amount));
-  const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amount));
-  const b = Math.min(255, Math.max(0, (num & 0x0000ff) + amount));
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
-}
 ```
 
-## Usage Examples
-
-### Basic Sticky Note
+## Usage
 
 ```tsx
-<StickyNote message="Don't forget to buy milk! 🥛" />
-```
-
-### Custom Colors
-
-```tsx
-// Pink note
-<StickyNote 
-  message="Call Sarah back" 
-  color="#ffcdd2" 
-/>
-
-// Blue note
-<StickyNote 
-  message="Meeting at 3pm" 
-  color="#bbdefb" 
-/>
-
-// Green note
-<StickyNote 
-  message="Task completed ✓" 
-  color="#c8e6c9" 
-/>
-```
-
-### Sticky Note Wall
-
-```tsx
-function StickyNoteWall() {
-  const notes = [
-    { message: "Buy groceries 🛒", color: "#fff9c4" },
-    { message: "Call mom ☎️", color: "#ffcdd2" },
-    { message: "Finish project 💻", color: "#bbdefb" },
-    { message: "Gym at 6pm 💪", color: "#c8e6c9" },
-  ];
-
-  return (
-    <div style={{ 
-      display: "grid", 
-      gridTemplateColumns: "repeat(2, 1fr)", 
-      gap: "20px",
-      padding: "20px"
-    }}>
-      {notes.map((note, i) => (
-        <StickyNote
-          key={i}
-          message={note.message}
-          color={note.color}
-          hiddenMessage={`Note ${i + 1} secret`}
-          width={180}
-          height={180}
-        />
-      ))}
-    </div>
-  );
-}
+<StickyNote message="Call Alex" />
 ```
 
 ## Styling Tips
 
-1. **Font Choice**: Use a handwritten font like "Patrick Hand" from Google Fonts
-2. **Subtle Shadows**: Add a light box-shadow for depth
-3. **Slight Rotation**: Rotate notes slightly for a natural look
-4. **Color Palette**: Use pastel colors for a classic sticky note feel
-
-```css
-/* Optional: Add Google Font */
-@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
-
-/* Rotate for natural look */
-.sticky-note-container:nth-child(1) { transform: rotate(-2deg); }
-.sticky-note-container:nth-child(2) { transform: rotate(1deg); }
-.sticky-note-container:nth-child(3) { transform: rotate(-1deg); }
-.sticky-note-container:nth-child(4) { transform: rotate(2deg); }
-```
+- Use pastel colors for the top layer.
+- Add padding and a subtle box shadow for depth.
+- Consider a handwritten font for the top layer text.

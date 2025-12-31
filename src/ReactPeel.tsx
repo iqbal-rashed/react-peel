@@ -13,17 +13,20 @@ function Peel(
   const peelRef = useRef<PeelRef | null>(null);
   const lastProgressRef = useRef<number>(0);
   const isPeelingRef = useRef<boolean>(false);
+  const initializedRef = useRef<boolean>(false);
 
   useInitializeCss();
 
-  // Merge preset options with provided options
+  // Merge preset options with provided options - use JSON.stringify for stable comparison
+  const optionsKey = JSON.stringify(options);
   const mergedOptions = React.useMemo(() => {
     if (props.preset) {
       const preset = getPreset(props.preset);
       return { ...preset.options, ...options };
     }
     return options;
-  }, [props.preset, options]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.preset, optionsKey]);
 
   // Get preset corner and mode if not explicitly provided
   const effectiveCorner = React.useMemo(() => {
@@ -76,6 +79,10 @@ function Peel(
   }, [props.onPeelEnd]);
 
   useEffect(() => {
+    // Only initialize once
+    if (initializedRef.current || !ref.current) return;
+    initializedRef.current = true;
+
     function initialize() {
       if (!ref.current) return;
       const PeelJs = PeelLib();
@@ -180,9 +187,12 @@ function Peel(
     return () => {
       if (peelRef.current) {
         peelRef.current.clear();
+        peelRef.current = null;
+        initializedRef.current = false;
       }
     };
-  }, [mergedOptions, props.disabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (props.timeAlongPath) {
@@ -350,24 +360,24 @@ const useInitializeCss = () => {
 /**
  * Top layer of the peel effect (the page being peeled)
  */
-export const PeelTop = forwardRef<HTMLDivElement, HtmlDivProps>(function PeelTop(
-  { className = "", ...props },
-  ref
-) {
-  return <div ref={ref} className={"peel-top " + className} {...props}></div>;
-});
+export const PeelTop = forwardRef<HTMLDivElement, HtmlDivProps>(
+  function PeelTop({ className = "", ...props }, ref) {
+    return <div ref={ref} className={"peel-top " + className} {...props}></div>;
+  }
+);
 
 PeelTop.displayName = "PeelTop";
 
 /**
  * Back layer of the peel effect (backside of the page)
  */
-export const PeelBack = forwardRef<HTMLDivElement, HtmlDivProps>(function PeelBack(
-  { className = "", ...props },
-  ref
-) {
-  return <div ref={ref} className={"peel-back " + className} {...props}></div>;
-});
+export const PeelBack = forwardRef<HTMLDivElement, HtmlDivProps>(
+  function PeelBack({ className = "", ...props }, ref) {
+    return (
+      <div ref={ref} className={"peel-back " + className} {...props}></div>
+    );
+  }
+);
 
 PeelBack.displayName = "PeelBack";
 

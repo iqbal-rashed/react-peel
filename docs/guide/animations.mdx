@@ -1,0 +1,132 @@
+# Animations
+
+React Peel provides two animation layers:
+
+1. The `usePeel` hook for peel-specific motion.
+2. Utility helpers for lower-level control.
+
+## usePeel.animate
+
+The `animate` function moves the peel corner from one position to another.
+
+```tsx
+import { PeelWrapper, PeelTop, PeelBack, PeelBottom, usePeel } from "react-peel";
+
+function AnimatedCard() {
+  const { peelRef, animate, reset } = usePeel();
+
+  const reveal = async () => {
+    await animate({
+      to: { x: -80, y: -80 },
+      duration: 600,
+      easing: "easeOut",
+    });
+  };
+
+  return (
+    <>
+      <button onClick={reveal}>Reveal</button>
+      <button onClick={reset}>Reset</button>
+
+      <PeelWrapper ref={peelRef} height={200} width={200}>
+        <PeelTop style={{ backgroundColor: "#81afcb" }} />
+        <PeelBack style={{ backgroundColor: "#a0c7df" }} />
+        <PeelBottom style={{ backgroundColor: "#688394" }} />
+      </PeelWrapper>
+    </>
+  );
+}
+```
+
+Supported easing names for `usePeel.animate`:
+
+- `linear`
+- `easeIn`
+- `easeOut`
+- `easeInOut`
+- `spring`
+
+## peelHint
+
+Use `peelHint` to nudge the user toward the peel corner.
+
+```tsx
+import { peelHint } from "react-peel";
+
+await peelHint(peelRef.current, {
+  peekSize: 24,
+  duration: 300,
+  repeat: 2,
+});
+```
+
+## loopPeel
+
+Create a looping animation along a path.
+
+```tsx
+import { loopPeel } from "react-peel";
+
+const stop = loopPeel({
+  peel: peelRef.current,
+  path: [200, 200, -200, -200],
+  duration: 1200,
+  pingPong: true,
+});
+
+stop();
+```
+
+## animatePeelPosition
+
+Animate a peel instance directly using the shared `easings` set.
+
+```tsx
+import { animatePeelPosition } from "react-peel";
+
+animatePeelPosition({
+  peel: peelRef.current,
+  from: { x: 200, y: 200 },
+  to: { x: 40, y: 40 },
+  duration: 500,
+  easing: "easeInOut",
+});
+```
+
+## Low-Level animate
+
+The `animate` utility can be used for generic value animation.
+
+```tsx
+import { animate } from "react-peel";
+
+const { stop, finished } = animate({
+  from: 0,
+  to: 100,
+  duration: 500,
+  easing: "easeOut",
+  onUpdate: (value) => console.log(value),
+});
+
+await finished;
+```
+
+## Combine with Events
+
+```tsx
+const { peelRef, animate } = usePeel();
+
+<PeelWrapper
+  ref={peelRef}
+  onPeelStart={(peel) => console.log("start", peel)}
+  onPeelProgress={(progress) => {
+    if (progress > 0.6) {
+      // Auto-complete past the halfway point
+      animate({ to: { x: 0, y: 0 }, duration: 300 });
+    }
+  }}
+  onPeelEnd={(peel) => console.log("end", peel)}
+>
+  ...
+</PeelWrapper>
+```

@@ -1,0 +1,28 @@
+{
+  "name": "React Peel Documentation",
+  "short_name": "React Peel",
+  "description": "Create stunning, realistic peeling effects in React applications. A lightweight, customizable library for page peel animations, sticky notes, scratch cards, and more.",
+  "start_url": "/react-peel/",
+  "scope": "/react-peel/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/react-peel/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/react-peel/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["developer tools", "utilities"],
+  "lang": "en-US",
+  "dir": "ltr"
+}

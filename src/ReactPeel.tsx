@@ -25,7 +25,6 @@ function Peel(
       return { ...preset.options, ...options };
     }
     return options;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.preset, optionsKey]);
 
   // Get preset corner and mode if not explicitly provided
@@ -191,7 +190,6 @@ function Peel(
         initializedRef.current = false;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

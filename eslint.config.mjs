@@ -25,5 +25,10 @@ export default defineConfig([
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-this-alias": "off",
     },
+    settings: {
+      react: {
+        version: "detect",
+      },
+    },
   },
 ]);

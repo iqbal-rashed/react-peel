@@ -30,6 +30,7 @@ export default defineConfig({
   head: [
     // Primary Meta Tags
     ["meta", { name: "keywords", content: siteKeywords }],
+    `<meta name="google-site-verification" content="Cd_g_GaBizW_GrvfaaLgrRd9omGyJxrxFKQKf0ktSk8" />`,
     ["meta", { name: "author", content: "Iqbal Rashed" }],
     ["meta", { name: "robots", content: "index, follow" }],
     ["meta", { name: "googlebot", content: "index, follow" }],

@@ -267,7 +267,7 @@ export default defineConfig({
             .map(
               (page) => `  <url>
               <loc>${siteUrl}${page}</loc>
-              <lastmod>${new Date().toISOString().split("T")[0]}</lastmod>
+              <lastmod>${new Date().toISOString()}</lastmod>
               <changefreq>weekly</changefreq>
               <priority>${page === "" ? "1.0" : "0.8"}</priority>
             </url>`
